@@ -28,7 +28,7 @@
     <bean id="stateMachine" class="org.room13.slf4fx.SLF4FxStateMachine">
         <property name="knownApplicaions">
             <map>
-                <entry key="TestClient" value="mySecret"/>
+                <entry key="myApplication" value="mySecret"/>
             </map>
         </property>
     </bean>
