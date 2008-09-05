@@ -15,9 +15,9 @@
 
     <modules>
         <module>slf4fx-server</module>
+        <module>slf4fx-client</module>
         <!--
         <module>slf4fx-server-standalone</module>
-        <module>slf4fx-client</module>
         -->
     </modules>
 
