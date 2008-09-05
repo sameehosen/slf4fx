@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:Application xmlns:mx="http://www.adobe.com/2006/mxml" layout="absolute" applicationComplete="init()">
+<mx:Script><![CDATA[
+	import mx.logging.LogEventLevel;
+	import org.room13.terminal.logging.SocketLoggingTarget;
+	import mx.logging.Log;
+	import mx.logging.ILogger;
+	import mx.controls.Alert;
+	
+	private var _log : ILogger = Log.getLogger("org.room13.terminal.TestLogger");
+	
+	private function init() : void {
+		Log.addTarget(new SocketLoggingTarget("TestLoggerApplication","secret"));
+	}
+	
+	private function generateLogRecords() : void {
+		var xml : XML = <tag>My Super XML</tag>;
+		_log.debug("test: {0} {1} {2}",12,true,xml.toXMLString());
+	}
+]]></mx:Script>	
+<mx:Button label="Generate log records" x="20" y="20" click="generateLogRecords()"/>
+</mx:Application>
