@@ -1,22 +1,25 @@
 <?xml version="1.0" encoding="utf-8"?>
 <mx:Application xmlns:mx="http://www.adobe.com/2006/mxml" layout="absolute" applicationComplete="init()">
-<mx:Script><![CDATA[
-	import mx.logging.LogEventLevel;
-	import org.room13.terminal.logging.SocketLoggingTarget;
-	import mx.logging.Log;
-	import mx.logging.ILogger;
-	import mx.controls.Alert;
-	
-	private var _log : ILogger = Log.getLogger("org.room13.terminal.TestLogger");
-	
-	private function init() : void {
-		Log.addTarget(new SocketLoggingTarget("TestLoggerApplication","secret"));
-	}
-	
-	private function generateLogRecords() : void {
-		var xml : XML = <tag>My Super XML</tag>;
-		_log.debug("test: {0} {1} {2}",12,true,xml.toXMLString());
-	}
-]]></mx:Script>	
-<mx:Button label="Generate log records" x="20" y="20" click="generateLogRecords()"/>
+    <mx:Script><![CDATA[
+import mx.logging.LogEventLevel;
+        import org.room13.terminal.logging.Slf4FxLoggingTarget;
+        import mx.logging.Log;
+        import mx.logging.ILogger;
+
+        private var _log : ILogger = Log.getLogger("org.room13.terminal.TestLogger");
+
+        private function init() : void {
+            Log.addTarget(new Slf4FxLoggingTarget("myApplication", "mySecret"));
+        }
+
+        private function generateLogRecords() : void {
+            var xml : XML = <tag>My Super XML</tag>;
+            _log.debug("DEBUG*** test: {0} {1} {2}", LogEventLevel.DEBUG, true, xml.toXMLString());
+            _log.info("INFO*** test: {0} {1} {2}", LogEventLevel.INFO, true, xml.toXMLString());
+            _log.warn("WARN*** test: {0} {1} {2}", LogEventLevel.WARN, true, xml.toXMLString());
+            _log.error("ERROR*** test: {0} {1} {2}", LogEventLevel.ERROR, true, xml.toXMLString());
+            _log.fatal("FATAL*** test: {0} {1} {2}", LogEventLevel.FATAL, true, xml.toXMLString());
+        }
+        ]]></mx:Script>
+    <mx:Button label="Generate log records" x="20" y="20" click="generateLogRecords()"/>
 </mx:Application>
