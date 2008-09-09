@@ -63,8 +63,7 @@ public class SLF4FxStateMachine {
 
     @IoHandlerTransition(on = MESSAGE_RECEIVED, in = HANDSHAKE, next = IDLE)
     public void onAccessRequest(final SLF4FxSessionContext context, final IoSession session, final AccessRequest command) {
-        if (_knownApplicaions.containsKey(command.getApplicationId())
-                && _knownApplicaions.get(command.getApplicationId()).equals(command.getSecret())) {
+        if (isApplicationKnown(command.getApplicationId(), command.getSecret())) {
             context.setApplicationId(command.getApplicationId());
             context.setAccessCode(command.getSecret());
             session.write(new AccessResponse(true));
@@ -72,6 +71,14 @@ public class SLF4FxStateMachine {
             return;
         }
         session.write(new AccessResponse(false));
+    }
+
+    @SuppressWarnings({"SimplifiableIfStatement"})
+    private boolean isApplicationKnown(final String applicationId, final String secret) {
+        if (_knownApplicaions.isEmpty())
+            return true;
+        return _knownApplicaions.containsKey(applicationId)
+                && _knownApplicaions.get(applicationId).equals(secret);
     }
 
     @IoHandlerTransition(on = MESSAGE_RECEIVED, in = IDLE)

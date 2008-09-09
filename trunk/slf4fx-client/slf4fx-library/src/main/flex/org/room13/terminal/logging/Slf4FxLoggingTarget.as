@@ -1,12 +1,12 @@
 package org.room13.terminal.logging
 {
+import mx.logging.LogEventLevel;
 import flash.events.*;
 import flash.net.Socket;
 
 import mx.logging.AbstractTarget;
 import mx.logging.ILogger;
 import mx.logging.LogEvent;
-import mx.logging.LogEventLevel;
 
 
 public class Slf4FxLoggingTarget extends AbstractTarget
@@ -32,6 +32,9 @@ public class Slf4FxLoggingTarget extends AbstractTarget
 
     private var _currentState : uint = _STATE_DISCONNECTED;
 
+    private static const _MAX_PENDING_MESSAGES : int = 100;
+    private var _pendingLogEvents : Array = new Array();
+
     /**
      * Creates instance of target with given name.
      * name name of the application
@@ -53,16 +56,49 @@ public class Slf4FxLoggingTarget extends AbstractTarget
 
     override public function logEvent(event:LogEvent) : void {
         if (_currentState == _STATE_DISCONNECTED) {
+            addPendingLogEvent(event);
             doConnect();
             return;
         }
         if (_currentState != _STATE_IDLE) {
+            addPendingLogEvent(event);
             return;
         }
+        writeLogEvent(event);
+    }
+
+    private function writeLogEvent(event:LogEvent) : void {
         _socket.writeByte(_MSG_NEW_RECORD);
         _socket.writeUTF(ILogger(event.target).category);
-        _socket.writeInt(event.level);
+        _socket.writeInt(convertToSlf4jLevel(event.level));
         _socket.writeUTF(event.message);
+    }
+
+    private function addPendingLogEvent(event:LogEvent) : void {
+        if (_pendingLogEvents.length == _MAX_PENDING_MESSAGES)
+            return;
+        _pendingLogEvents.push(event);
+    }
+
+    private function convertToSlf4jLevel(level:int):int {
+        /* Next is enum from corresponding LogRecordMessage.java
+         public enum Level {
+         ERROR, WARN, INFO, DEBUG, TRACE
+         }
+         */
+        switch (level) {
+            case LogEventLevel.FATAL:
+            case LogEventLevel.ERROR:
+                return 0;
+            case LogEventLevel.WARN:
+                return 1;
+            case LogEventLevel.INFO:
+                return 2;
+            case LogEventLevel.DEBUG:
+                return 3;
+            default:
+                return 2;
+        }
     }
 
     private function doConnect() : void {
@@ -87,19 +123,24 @@ public class Slf4FxLoggingTarget extends AbstractTarget
 
     //noinspection JSUnusedLocalSymbols
     private function closeHandler(event:Event):void {
-        _currentState = _STATE_DISCONNECTED;
+        cleanUp(false);
     }
 
     //noinspection JSUnusedLocalSymbols
     private function securityErrorHandler(event:SecurityErrorEvent):void {
-        _socket.close();
-        _currentState = _STATE_DISCONNECTED;
+        cleanUp();
     }
 
     //noinspection JSUnusedLocalSymbols
     private function ioErrorHandler(event:IOErrorEvent):void {
-        _socket.close();
+        cleanUp();
+    }
+
+    private function cleanUp(doSocketClose:Boolean = true):void {
+        if (doSocketClose)
+            _socket.close();
         _currentState = _STATE_DISCONNECTED;
+        _pendingLogEvents.splice(0, _pendingLogEvents.length);
     }
 
     //noinspection JSUnusedLocalSymbols
@@ -113,16 +154,22 @@ public class Slf4FxLoggingTarget extends AbstractTarget
     //noinspection JSUnusedLocalSymbols
     private function dataHandler(event:ProgressEvent):void {
         if (_currentState != _STATE_WAITING_ACCESS_RESPONSE) {
+            cleanUp();
             return;
         }
         if (_socket.readByte() != _MSG_ACCESS_RESPONSE) {
+            cleanUp();
             return;
         }
         if (_socket.readByte() == 1) {
             _currentState = _STATE_IDLE;
+            for each (var logEvent:LogEvent in _pendingLogEvents) {
+                writeLogEvent(logEvent);
+            }
+            _pendingLogEvents.splice(0, _pendingLogEvents.length);
             return;
         }
-        _socket.close();
+        cleanUp();
     }
 }
 }
