@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <mx:Application xmlns:mx="http://www.adobe.com/2006/mxml" layout="absolute" applicationComplete="init()">
     <mx:Script><![CDATA[
-import mx.logging.LogEventLevel;
-        import org.room13.terminal.logging.Slf4FxLoggingTarget;
+        import mx.logging.LogEventLevel;
+        import org.room13.slf4fx.Slf4FxLoggingTarget;
         import mx.logging.Log;
         import mx.logging.ILogger;
 
