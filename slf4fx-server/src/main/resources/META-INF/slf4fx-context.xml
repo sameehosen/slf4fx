@@ -25,6 +25,9 @@
         </property>
     </bean>
 
+    <bean id="stateMachine" class="org.room13.slf4fx.SLF4FxStateMachine"/>
+
+    <!-- if you have to restrict access to known applications only
     <bean id="stateMachine" class="org.room13.slf4fx.SLF4FxStateMachine">
         <property name="knownApplicaions">
             <map>
@@ -32,6 +35,7 @@
             </map>
         </property>
     </bean>
+    -->
 
     <bean id="codecFilter" class="org.apache.mina.filter.codec.ProtocolCodecFilter">
         <constructor-arg>
