@@ -13,12 +13,11 @@
         }
 
         private function generateLogRecords() : void {
-            var xml : XML = <tag>My Super XML</tag>;
-            _log.debug("DEBUG*** test: {0} {1} {2}", LogEventLevel.DEBUG, true, xml.toXMLString());
-            _log.info("INFO*** test: {0} {1} {2}", LogEventLevel.INFO, true, xml.toXMLString());
-            _log.warn("WARN*** test: {0} {1} {2}", LogEventLevel.WARN, true, xml.toXMLString());
-            _log.error("ERROR*** test: {0} {1} {2}", LogEventLevel.ERROR, true, xml.toXMLString());
-            _log.fatal("FATAL*** test: {0} {1} {2}", LogEventLevel.FATAL, true, xml.toXMLString());
+            _log.debug("level={0} {1}", LogEventLevel.DEBUG, "**DEBUG**");
+            _log.info("level={0} {1}", LogEventLevel.INFO, "**INFO**");
+            _log.warn("level={0} {1}", LogEventLevel.WARN, "**WARN**");
+            _log.error("level={0} {1}", LogEventLevel.ERROR, "**ERROR**");
+            _log.fatal("level={0} {1}", LogEventLevel.FATAL, "**FATAL**");
         }
         ]]></mx:Script>
     <mx:Button label="Generate log records" x="20" y="20" click="generateLogRecords()"/>
