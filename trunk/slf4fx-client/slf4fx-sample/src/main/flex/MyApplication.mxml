@@ -6,7 +6,7 @@
         import mx.logging.Log;
         import mx.logging.ILogger;
 
-        private var _log : ILogger = Log.getLogger("org.room13.terminal.TestLogger");
+        private var _log : ILogger = Log.getLogger("org.room13.slf4fx.MyApplication");
 
         private function init() : void {
             Log.addTarget(new Slf4FxLoggingTarget("myApplication", "mySecret"));
