@@ -23,9 +23,9 @@
         <version>1.0-SNAPSHOT</version>
     </parent>
 
-    <packaging>swc</packaging>
-    <artifactId>slf4fx-library</artifactId>
-    <name>slf4fx :: flex :: library</name>
+    <packaging>swf</packaging>
+    <artifactId>slf4fx-sample</artifactId>
+    <name>slf4fx :: flex :: sample application</name>
 
     <build>
         <plugins>
@@ -34,8 +34,20 @@
                 <artifactId>flex-compiler-mojo</artifactId>
                 <configuration>
                     <debug>false</debug>
+                    <sourceFile>MyApplication.mxml</sourceFile>
+                    <output>MyApplication.swf</output>
                 </configuration>
             </plugin>
         </plugins>
     </build>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.room13.slf4fx</groupId>
+            <artifactId>slf4fx-library</artifactId>
+            <version>${project.parent.version}</version>
+            <type>swc</type>
+            <scope>internal</scope>
+        </dependency>
+    </dependencies>
 </project>

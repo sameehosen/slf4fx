@@ -35,6 +35,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 /**
  * TODO: Document the class
@@ -48,6 +49,15 @@ public class SLF4FxStateMachine {
     @State(ROOT)
     public static final String IDLE = "IDLE";
     private Map<String, String> _knownApplicaions = new HashMap<String, String>();
+    private int _sessionTimeout = 30;
+
+    public int getSessionTimeout() {
+        return _sessionTimeout;
+    }
+
+    public void setSessionTimeout(final int sessionTimeout) {
+        _sessionTimeout = sessionTimeout;
+    }
 
     public Map<String, String> getKnownApplicaions() {
         return _knownApplicaions;
@@ -74,6 +84,11 @@ public class SLF4FxStateMachine {
     public void exceptionCaught(final IoSession session, Throwable cause) {
         _log.error("exception caught {}({})", cause.getClass().getName(), cause.getMessage());
         session.close();
+    }
+
+    @IoHandlerTransition(on = SESSION_CREATED, in = ROOT)
+    public void sessionCreated(final IoSession session) {
+        session.getConfig().setReaderIdleTime(getSessionTimeout());
     }
 
     @IoHandlerTransition(on = MESSAGE_RECEIVED, in = HANDSHAKE, next = IDLE)

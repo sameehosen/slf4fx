@@ -23,10 +23,19 @@ import mx.logging.AbstractTarget;
 import mx.logging.ILogger;
 import mx.logging.LogEvent;
 
-
+/**
+ * Connects to slf4fx server and sent all log events to it.
+ * Collects some amount of log events (100) on client side during connection.
+ * Levels of Flex logging events maps to slf4j levels as:
+ * DEBUG is DEBUG,
+ * INFO is INFO,
+ * WARN is WARN,
+ * ERROR is ERROR,
+ * FATAL is ERROR
+ */
 public class Slf4FxLoggingTarget extends AbstractTarget
 {
-    private static const _CLASSNAME : String = "org.room13.terminal.logging.Slf4FxLoggingTarget";
+    private static const _CLASSNAME : String = "org.room13.slf4fx.Slf4FxLoggingTarget";
 
     private static const _MSG_UNKNOWN : uint = 0;
     private static const _MSG_ACCESS_REQUEST : uint = 1;
@@ -51,13 +60,16 @@ public class Slf4FxLoggingTarget extends AbstractTarget
     private var _pendingLogEvents : Array = new Array();
 
     /**
-     * Creates instance of target with given name.
-     * name name of the application
-     * secret access code to remote server
-     * @param logServer log server name or its ip address
-     * @param logServerPort log server port
+     * Creates instance of target for application with given name.
+     *
+     * @param applicationName name of the application
+     * @param secret that secret and application name will be used as credentials during connection to slf4fx server.
+     * The secret is "" by default
+     * @param logServer log server name or its ip address. Default value is "localhost"
+     * @param logServerPort log server port. Default value is 18888
      */
-    public function Slf4FxLoggingTarget(applicationName:String, secret:String = "", logServer:String = "localhost", logServerPort:uint = 8888)
+    public function Slf4FxLoggingTarget(applicationName:String, secret:String = "",
+                                        logServer:String = "localhost", logServerPort:uint = 18888)
     {
         super();
         this.level = LogEventLevel.ALL;
