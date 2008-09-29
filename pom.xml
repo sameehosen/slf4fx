@@ -62,6 +62,13 @@
         <url>http://code.google.com/p/slf4fx/issues/list</url>
     </issueManagement>
 
+    <distributionManagement>
+        <repository>
+            <id>internal</id>
+            <url>http://maven/internal</url>
+        </repository>
+    </distributionManagement>
+
     <modules>
         <module>slf4fx-server</module>
         <module>slf4fx-client</module>
