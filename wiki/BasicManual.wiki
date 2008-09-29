@@ -7,11 +7,11 @@
 
 Standalone server uses log4j logging kit but you can easily integrate slf4fx server into your server and use any logging kit supported by slf4j.
 There are some options to configure slf4fx server:
-
- -b,--bind <arg>                 bind SLF4Fx server to this ip address and port (ADDRESS:PORT)
- -h,--help                       print this message
- -k,--known-applications <arg>   known applications descriptor file(one pair application=secret per line)
- -t,--session-timeout <arg>      session timeout in seconds
+|| *Short options* || *Long options* || *Description* ||
+|| -b <arg> || --bind <arg> || bind SLF4Fx server to this ip address and port (ADDRESS:PORT) ||
+|| -h              || --help              || print this message ||
+||-k <arg> || --known-applications <arg> || known applications descriptor file(one pair application=secret per line)||
+||-t <arg> ||--session-timeout <arg> || session timeout in seconds||
 
 Source code of sample application is MyApplication.mxml 
 
