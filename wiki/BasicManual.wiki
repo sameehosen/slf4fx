@@ -1,0 +1,18 @@
+#summary Very basic manual
+#labels Featured
+
+  # Download binaries.
+  # Run server `java -jar slf4fx-server.jar`
+  # To run sample application `open MyApplication.swf file in any browser with installed Adobe Flash Player plugin`
+
+Standalone server uses log4j logging kit but you can easily integrate slf4fx server into your server and use any logging kit supported by slf4j.
+There are some options to configure slf4fx server:
+
+ -b,--bind <arg>                 bind SLF4Fx server to this ip address and port (ADDRESS:PORT)
+ -h,--help                       print this message
+ -k,--known-applications <arg>   known applications descriptor file(one pair application=secret per line)
+ -t,--session-timeout <arg>      session timeout in seconds
+
+Source code of sample application is MyApplication.mxml 
+
+Enjoy :)
