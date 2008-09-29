@@ -110,6 +110,13 @@ public class SLF4FxServer {
             }
             _log.info("listen {}", acceptor.getDefaultLocalAddress());
 
+            Runtime.getRuntime().addShutdownHook(new Thread(new Runnable(){
+                public void run() {
+                    acceptor.unbind();
+                    _log.info("server stopped");
+                }
+            }));
+
             acceptor.bind();
             _log.info("server started in {}ms", System.currentTimeMillis() - startTime);
         } catch (IOException e) {

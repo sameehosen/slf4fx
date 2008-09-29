@@ -79,6 +79,7 @@
         <property name="handler" ref="serverHandler"/>
         <property name="reuseAddress" value="true"/>
         <property name="filterChainBuilder" ref="filterChainBuilder"/>
+        <property name="closeOnDeactivation" value="true"/>
     </bean>
 
 </beans>
