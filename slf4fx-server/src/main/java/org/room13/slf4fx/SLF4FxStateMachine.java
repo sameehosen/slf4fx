@@ -48,6 +48,7 @@ public class SLF4FxStateMachine {
     private Map<String, String> _knownApplicaions = new HashMap<String, String>();
     private int _sessionTimeout = 30;
     private String _policyContent = null;
+    private int _readerBufferSize = 1024;
 
     public int getSessionTimeout() {
         return _sessionTimeout;
@@ -73,6 +74,14 @@ public class SLF4FxStateMachine {
         _policyContent = policyContent;
     }
 
+    public int getReaderBufferSize() {
+        return _readerBufferSize;
+    }
+
+    public void setReaderBufferSize(final int readerBufferSize) {
+        _readerBufferSize = readerBufferSize;
+    }
+
     @IoHandlerTransition(on = ANY, in = ROOT, weight = 1000)
     public void unhandledEvent(final Event event) {
         final StringBuilder sb = new StringBuilder();
@@ -95,6 +104,7 @@ public class SLF4FxStateMachine {
     @IoHandlerTransition(on = SESSION_CREATED, in = ROOT)
     public void sessionCreated(final IoSession session) {
         session.getConfig().setReaderIdleTime(getSessionTimeout());
+        session.getConfig().setReadBufferSize(getReaderBufferSize());
     }
 
     @IoHandlerTransition(on = MESSAGE_RECEIVED, in = HANDSHAKE, next = IDLE)

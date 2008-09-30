@@ -41,6 +41,7 @@ public class SLF4FxServer {
                 .addOption(new Option("b", "bind", true, "bind SLF4Fx server to this ip address and port (ADDRESS:PORT) "))
                 .addOption(new Option("t", "session-timeout", true, "session timeout in seconds"))
                 .addOption(new Option("p", "policy-file", true, "socket policy file for Adobe Flash Player"))
+                .addOption(new Option("r", "reader-buffer-size", true, "protocol decoder buffer size"))
                 .addOption(new Option("k", "known-applications", true, "known applications descriptor file" +
                         "(one pair application=secret per line)"));
     }
@@ -116,6 +117,11 @@ public class SLF4FxServer {
                 stateMachine.setSessionTimeout(Integer.parseInt(commandLine.getOptionValue("session-timeout")));
             }
             _log.info("session timeout is {} seconds", stateMachine.getSessionTimeout());
+
+            if (commandLine.hasOption("reader-buffer-size")) {
+                stateMachine.setReaderBufferSize(Integer.parseInt(commandLine.getOptionValue("reader-buffer-size")));
+            }
+            _log.info("reader buffer size is {}", stateMachine.getReaderBufferSize());
 
             if (commandLine.hasOption("known-applications")) {
                 final File file = new File(commandLine.getOptionValue("known-applications"));
