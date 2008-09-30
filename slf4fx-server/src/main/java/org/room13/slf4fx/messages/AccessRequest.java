@@ -17,19 +17,14 @@ package org.room13.slf4fx.messages;
 
 import org.apache.mina.core.buffer.IoBuffer;
 import org.room13.slf4fx.Message;
-import static org.room13.slf4fx.Message.MessageTypeId.AccessRequest;
+import static org.room13.slf4fx.Message.MessageType.AccessRequest;
 
 import java.nio.charset.CharacterCodingException;
-import java.nio.charset.Charset;
-import java.nio.charset.CharsetDecoder;
-import java.nio.charset.CharsetEncoder;
 
 /**
  * Used by client and server to handshake
  */
-public class AccessRequest implements Message {
-    private final CharsetEncoder _charsetEncoder = Charset.forName("UTF-8").newEncoder();
-    private final CharsetDecoder _charsetDecoder = Charset.forName("UTF-8").newDecoder();
+public class AccessRequest extends Message {
     private String _applicationId;
     private String _secret;
 
@@ -49,23 +44,22 @@ public class AccessRequest implements Message {
         return _secret;
     }
 
-    public MessageTypeId getMessageId() {
+    public MessageType getType() {
         return AccessRequest;
     }
 
     public IoBuffer toIoBuffer() throws CharacterCodingException {
         final IoBuffer buffer = IoBuffer.allocate(1);
         buffer.setAutoExpand(true);
-        buffer.put((byte) getMessageId().ordinal());
-        buffer.putPrefixedString(getApplicationId(), _charsetEncoder);
-        buffer.putPrefixedString(getSecret(), _charsetEncoder);
+        buffer.put(getType().getValue());
+        buffer.putPrefixedString(getApplicationId(), getCharsetEncoder());
+        buffer.putPrefixedString(getSecret(), getCharsetEncoder());
         buffer.flip();
         return buffer;
     }
 
-    public AccessRequest read(final IoBuffer in) throws CharacterCodingException {
-        _applicationId = in.getPrefixedString(_charsetDecoder).intern();
-        _secret = in.getPrefixedString(_charsetDecoder).intern();
-        return this;
+    protected void readIoBuffer(final IoBuffer in) throws CharacterCodingException {
+        _applicationId = in.getPrefixedString(getCharsetDecoder()).intern();
+        _secret = in.getPrefixedString(getCharsetDecoder()).intern();
     }
 }
