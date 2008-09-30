@@ -23,10 +23,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.net.SocketAddress;
 import java.util.HashMap;
 import java.util.Map;
@@ -43,6 +40,7 @@ public class SLF4FxServer {
                 .addOption(new Option("h", "help", false, "print this message"))
                 .addOption(new Option("b", "bind", true, "bind SLF4Fx server to this ip address and port (ADDRESS:PORT) "))
                 .addOption(new Option("t", "session-timeout", true, "session timeout in seconds"))
+                .addOption(new Option("p", "policy-file", true, "socket policy file for Adobe Flash Player"))
                 .addOption(new Option("k", "known-applications", true, "known applications descriptor file" +
                         "(one pair application=secret per line)"));
     }
@@ -69,6 +67,29 @@ public class SLF4FxServer {
             map.put(String.valueOf(key), props.getProperty(String.valueOf(key)));
         }
         return map;
+    }
+
+    private static String loadPolicyFile(final File file) {
+        Reader reader = null;
+        try {
+            reader = new FileReader(file);
+            final StringBuilder sb = new StringBuilder();
+            final char[] buffer = new char[4096];
+            for (int size; (size = reader.read(buffer)) != -1;) {
+                sb.append(buffer, 0, size);
+            }
+            return sb.toString();
+        } catch (Exception e) {
+            _log.warn("failed to load policy file", e);
+            return null;
+        } finally {
+            if (reader != null)
+                try {
+                    reader.close();
+                } catch (IOException e) {
+                    // ignore
+                }
+        }
     }
 
     public static void main(String[] args) {
@@ -103,6 +124,14 @@ public class SLF4FxServer {
             }
             _log.info("known applications {}", stateMachine.getKnownApplicaions().keySet());
 
+            if (commandLine.hasOption("policy-file")) {
+                final File file = new File(commandLine.getOptionValue("policy-file"));
+                _log.info("loading policy file from {}", file.getAbsolutePath());
+                stateMachine.setPolicyContent(loadPolicyFile(file));
+            }
+            _log.info("support for <policy-file-request/> is {}",
+                    stateMachine.getPolicyContent() == null ? "disabled" : "enabled");
+
             if (commandLine.hasOption("bind")) {
                 final InetSocketAddressEditor editor = (InetSocketAddressEditor) context.getBean("socketAddressEditor");
                 editor.setAsText(commandLine.getOptionValue("bind"));
@@ -110,7 +139,7 @@ public class SLF4FxServer {
             }
             _log.info("listen {}", acceptor.getDefaultLocalAddress());
 
-            Runtime.getRuntime().addShutdownHook(new Thread(new Runnable(){
+            Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {
                 public void run() {
                     acceptor.unbind();
                     _log.info("server stopped");
@@ -125,4 +154,5 @@ public class SLF4FxServer {
             _log.error("failed to parse command line", e);
         }
     }
+
 }

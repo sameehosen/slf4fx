@@ -17,23 +17,18 @@ package org.room13.slf4fx.messages;
 
 import org.apache.mina.core.buffer.IoBuffer;
 import org.room13.slf4fx.Message;
-import static org.room13.slf4fx.Message.MessageTypeId.NewRecord;
+import static org.room13.slf4fx.Message.MessageType.NewRecord;
 
 import java.nio.charset.CharacterCodingException;
-import java.nio.charset.Charset;
-import java.nio.charset.CharsetDecoder;
-import java.nio.charset.CharsetEncoder;
 
 /**
  * TODO: Document the class
  */
-public class LogRecordMessage implements Message {
+public class LogRecordMessage extends Message {
     public enum Level {
         ERROR, WARN, INFO, DEBUG, TRACE
     }
 
-    private final CharsetEncoder _charsetEncoder = Charset.forName("UTF-8").newEncoder();
-    private final CharsetDecoder _charsetDecoder = Charset.forName("UTF-8").newDecoder();
     private String _category;
     private Level _level;
     private String _message;
@@ -62,27 +57,26 @@ public class LogRecordMessage implements Message {
         _message = message;
     }
 
-    public MessageTypeId getMessageId() {
+    public MessageType getType() {
         return NewRecord;
     }
 
     public IoBuffer toIoBuffer() throws CharacterCodingException {
         final IoBuffer buffer = IoBuffer.allocate(1);
         buffer.setAutoExpand(true);
-        buffer.put((byte) getMessageId().ordinal());
-        buffer.putPrefixedString(getCategory(), _charsetEncoder);
+        buffer.put(getType().getValue());
+        buffer.putPrefixedString(getCategory(), getCharsetEncoder());
         buffer.putInt(getLevel().ordinal());
-        buffer.putPrefixedString(getMessage(), _charsetEncoder);
+        buffer.putPrefixedString(getMessage(), getCharsetEncoder());
         buffer.flip();
         return buffer;
     }
 
-    public Message read(final IoBuffer in) throws CharacterCodingException {
-        setCategory(in.getPrefixedString(_charsetDecoder).intern());
+    protected void readIoBuffer(final IoBuffer in) throws CharacterCodingException {
+        setCategory(in.getPrefixedString(getCharsetDecoder()).intern());
         final int levelIndex = in.getInt();
         setLevel(levelIndex < Level.values().length ? Level.values()[levelIndex] : Level.INFO);
-        setMessage(in.getPrefixedString(_charsetDecoder).intern());
-        return this;
+        setMessage(in.getPrefixedString(getCharsetDecoder()).intern());
     }
 
     @SuppressWarnings({"RedundantIfStatement"})

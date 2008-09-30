@@ -75,7 +75,7 @@
           factory-bean="stateMachine" factory-method="createIoHandler"/>
 
     <bean id="ioAcceptor" class="org.apache.mina.transport.socket.nio.NioSocketAcceptor">
-        <property name="defaultLocalAddress" value=":18888"/>
+        <property name="defaultLocalAddress" value="localhost:18888"/>
         <property name="handler" ref="serverHandler"/>
         <property name="reuseAddress" value="true"/>
         <property name="filterChainBuilder" ref="filterChainBuilder"/>

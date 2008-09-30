@@ -17,14 +17,14 @@ package org.room13.slf4fx.messages;
 
 import org.apache.mina.core.buffer.IoBuffer;
 import org.room13.slf4fx.Message;
-import static org.room13.slf4fx.Message.MessageTypeId.AccessResponse;
+import static org.room13.slf4fx.Message.MessageType.AccessResponse;
 
 import java.nio.charset.CharacterCodingException;
 
 /**
  * TODO: Document the class
  */
-public class AccessResponse implements Message {
+public class AccessResponse extends Message {
     private boolean _isAccessGranted=false;
 
     public AccessResponse() {
@@ -38,20 +38,19 @@ public class AccessResponse implements Message {
         return _isAccessGranted;
     }
 
-    public MessageTypeId getMessageId() {
+    public MessageType getType() {
         return AccessResponse;
     }
 
     public IoBuffer toIoBuffer() throws CharacterCodingException {
         final IoBuffer buffer = IoBuffer.allocate(2);
-        buffer.put((byte) getMessageId().ordinal());
+        buffer.put(getType().getValue());
         buffer.put((byte) (_isAccessGranted ? 1 : 0));
         buffer.flip();
         return buffer;
     }
 
-    public Message read(final IoBuffer in) throws CharacterCodingException {
+    protected void readIoBuffer(final IoBuffer in) throws CharacterCodingException {
         _isAccessGranted = in.get() != 0;
-        return this;
     }
 }

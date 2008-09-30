@@ -27,15 +27,12 @@ import org.apache.mina.statemachine.context.StateContext;
 import org.apache.mina.statemachine.context.StateContextFactory;
 import org.apache.mina.statemachine.event.Event;
 import static org.apache.mina.statemachine.event.IoHandlerEvents.*;
-import org.room13.slf4fx.messages.AccessRequest;
-import org.room13.slf4fx.messages.AccessResponse;
-import org.room13.slf4fx.messages.LogRecordMessage;
+import org.room13.slf4fx.messages.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.TimeUnit;
 
 /**
  * TODO: Document the class
@@ -50,6 +47,7 @@ public class SLF4FxStateMachine {
     public static final String IDLE = "IDLE";
     private Map<String, String> _knownApplicaions = new HashMap<String, String>();
     private int _sessionTimeout = 30;
+    private String _policyContent = null;
 
     public int getSessionTimeout() {
         return _sessionTimeout;
@@ -65,6 +63,14 @@ public class SLF4FxStateMachine {
 
     public void setKnownApplicaions(final Map<String, String> knownApplicaions) {
         _knownApplicaions = knownApplicaions;
+    }
+
+    public String getPolicyContent() {
+        return _policyContent;
+    }
+
+    public void setPolicyContent(final String policyContent) {
+        _policyContent = policyContent;
     }
 
     @IoHandlerTransition(on = ANY, in = ROOT, weight = 1000)
@@ -101,6 +107,18 @@ public class SLF4FxStateMachine {
             return;
         }
         session.write(new AccessResponse(false));
+    }
+
+    @SuppressWarnings({"UnusedDeclaration"})
+    @IoHandlerTransition(on = MESSAGE_RECEIVED, in = HANDSHAKE)
+    public void onPolicyFileRequest(final IoSession session, final PolicyFileRequest command) {
+        if (_policyContent==null) {
+            _log.warn("application has requested policy file but policy was not provided");
+            session.close();
+        }
+        final PolicyFileResponse response = new PolicyFileResponse();
+        response.setPolicyContent(_policyContent);
+        session.write(response);
     }
 
     @SuppressWarnings({"SimplifiableIfStatement"})
