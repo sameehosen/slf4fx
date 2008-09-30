@@ -126,6 +126,7 @@ public class SLF4FxStateMachine {
             _log.warn("application has requested policy file but policy was not provided");
             session.close();
         }
+        _log.info("socket policy file requested from {}",session.getRemoteAddress());
         final PolicyFileResponse response = new PolicyFileResponse();
         response.setPolicyContent(_policyContent);
         session.write(response);
