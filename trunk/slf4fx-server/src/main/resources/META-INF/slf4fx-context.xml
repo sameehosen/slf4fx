@@ -42,6 +42,7 @@
 
     <bean id="stateMachine" class="org.room13.slf4fx.SLF4FxStateMachine">
         <property name="sessionTimeout" value="60"/>
+        <property name="readerBufferSize" value="1024"/>
     </bean>
 
     <!-- if you have to restrict access to known applications only
