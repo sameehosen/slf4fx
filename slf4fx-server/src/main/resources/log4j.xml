@@ -22,6 +22,13 @@
         </layout>
     </appender>
 
+    <appender name="FILE" class="org.apache.log4j.FileAppender">
+        <param name="File" value="flex.log"/>
+        <layout class="org.apache.log4j.PatternLayout">
+            <param name="ConversionPattern" value="%d{yyyy.MM.dd HH:mm:ss.SSS} %-5p %c : %m%n"/>
+        </layout>
+    </appender>
+
     <category name="org.springframework" additivity="false">
         <level value="warn"/>
         <appender-ref ref="CONSOLE"/>
@@ -35,6 +42,7 @@
     <category name="slf4fx" additivity="false">
         <level value="debug"/>
         <appender-ref ref="CONSOLE"/>
+        <appender-ref ref="FILE"/>
     </category>
 
     <root>
