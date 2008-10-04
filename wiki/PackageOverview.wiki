@@ -30,6 +30,16 @@ Next code is the sample application that generates some log events when you clic
 </mx:Application>
 }}}
 
+=Log=
+Following is log of sample application:
+{{{
+01:06:27.883 DEBUG MyApplication : level=2 **DEBUG**
+01:06:27.890 INFO  MyApplication : level=4 **INFO**
+01:06:27.890 WARN  MyApplication : level=6 **WARN**
+01:06:27.891 ERROR MyApplication : level=8 **ERROR**
+01:06:27.891 ERROR MyApplication : level=1000 **FATAL**
+}}}
+
 =Server=
 
 ==Start server==
@@ -68,12 +78,5 @@ category named as:
 {{{
 slf4fx.APPLICATION_ID.LOG_RECORD_CATEGORY
 }}}
-Where `APPLICATION_ID` is application name given as parameter to `Slf4FxLoggingTarget` on client side and `LOG_RECORD_CATEGORY` is logger category on client side.
-Following is log of sample application:
-{{{
-01:06:27.883 DEBUG MyApplication : level=2 **DEBUG**
-01:06:27.890 INFO  MyApplication : level=4 **INFO**
-01:06:27.890 WARN  MyApplication : level=6 **WARN**
-01:06:27.891 ERROR MyApplication : level=8 **ERROR**
-01:06:27.891 ERROR MyApplication : level=1000 **FATAL**
-}}}
+`APPLICATION_ID` is application name given as parameter to `Slf4FxLoggingTarget` on client side and `LOG_RECORD_CATEGORY` is logger category on client side.
+Log4J can be configured from command line too by adding `-D...` parameter before `-jar slf4fx-server.jar` in command line. See Log4J documentation for details.
