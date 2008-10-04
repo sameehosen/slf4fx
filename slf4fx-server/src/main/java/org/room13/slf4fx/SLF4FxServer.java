@@ -129,16 +129,22 @@ public class SLF4FxServer {
         final CommandLineParser parser = new GnuParser();
 
         try {
-            CommandLine commandLine = parser.parse(options, args);
+            final ApplicationContext context = new ClassPathXmlApplicationContext("/META-INF/slf4fx-context.xml");
 
+            CommandLine commandLine = parser.parse(options, args);
             if (commandLine.hasOption("help")) {
                 HelpFormatter formatter = new HelpFormatter();
                 formatter.setWidth(80);
-                formatter.printHelp("SLF4Fx", options);
-                return;
+                formatter.printHelp(
+                        "java -jar slf4fx-server.jar [OPTIONS]",
+                        String.format("Version %s",context.getMessage("slf4fx.version", null, null)),
+                        options,
+                        "",
+                        false
+                );
+                System.exit(1);
             }
 
-            final ApplicationContext context = new ClassPathXmlApplicationContext("/META-INF/slf4fx-context.xml");
             _log.info("slf4fx (version {})", context.getMessage("slf4fx.version", null, null));
 
             final IoAcceptor acceptor = (IoAcceptor) context.getBean("ioAcceptor");
