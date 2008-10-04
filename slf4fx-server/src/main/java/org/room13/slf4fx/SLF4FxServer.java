@@ -36,14 +36,44 @@ public class SLF4FxServer {
     private static final Logger _log = LoggerFactory.getLogger(SLF4FxServer.class);
 
     private static Options buildOptions() {
+        final OptionGroup controlGroup = new OptionGroup();
+        OptionBuilder.withLongOpt("bind");
+        OptionBuilder.hasArg();
+        OptionBuilder.withArgName("ADDRESS[:PORT]");
+        OptionBuilder.withDescription("bind SLF4Fx server to this address");
+        controlGroup.addOption(OptionBuilder.create('b'));
+
+        OptionBuilder.withLongOpt("session-timeout");
+        OptionBuilder.hasArg();
+        OptionBuilder.withArgName("TIMEOUT");
+        OptionBuilder.withDescription("session timeout in seconds");
+        controlGroup.addOption(OptionBuilder.create('t'));
+
+        OptionBuilder.withLongOpt("policy-file");
+        OptionBuilder.hasArg();
+        OptionBuilder.withArgName("FILE");
+        OptionBuilder.withDescription("socket policy file for Adobe Flash Player");
+        controlGroup.addOption(OptionBuilder.create('p'));
+
+        OptionBuilder.withLongOpt("reader-buffer-size");
+        OptionBuilder.hasArg();
+        OptionBuilder.withArgName("BYTES");
+        OptionBuilder.withDescription("protocol decoder buffer size");
+        controlGroup.addOption(OptionBuilder.create('r'));
+
+        OptionBuilder.withLongOpt("known-applications");
+        OptionBuilder.hasArg();
+        OptionBuilder.withArgName("FILE");
+        OptionBuilder.withDescription("known applications descriptor file" +
+                "(one pair APPLICATION=SECRET per line)");
+        controlGroup.addOption(OptionBuilder.create('k'));
+
+        final OptionGroup helpGroup = new OptionGroup();
+        helpGroup.addOption(new Option("h", "help", false, "print this message"));
+
         return new Options()
-                .addOption(new Option("h", "help", false, "print this message"))
-                .addOption(new Option("b", "bind", true, "bind SLF4Fx server to this ip address and port (ADDRESS:PORT) "))
-                .addOption(new Option("t", "session-timeout", true, "session timeout in seconds"))
-                .addOption(new Option("p", "policy-file", true, "socket policy file for Adobe Flash Player"))
-                .addOption(new Option("r", "reader-buffer-size", true, "protocol decoder buffer size"))
-                .addOption(new Option("k", "known-applications", true, "known applications descriptor file" +
-                        "(one pair application=secret per line)"));
+                .addOptionGroup(helpGroup)
+                .addOptionGroup(controlGroup);
     }
 
     private static Map<String, String> loadKnownApplications(final File file) {
@@ -103,6 +133,7 @@ public class SLF4FxServer {
 
             if (commandLine.hasOption("help")) {
                 HelpFormatter formatter = new HelpFormatter();
+                formatter.setWidth(80);
                 formatter.printHelp("SLF4Fx", options);
                 return;
             }
