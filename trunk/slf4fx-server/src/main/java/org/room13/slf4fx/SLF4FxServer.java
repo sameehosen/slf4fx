@@ -36,44 +36,41 @@ public class SLF4FxServer {
     private static final Logger _log = LoggerFactory.getLogger(SLF4FxServer.class);
 
     private static Options buildOptions() {
-        final OptionGroup controlGroup = new OptionGroup();
+        final Options options = new Options();
         OptionBuilder.withLongOpt("bind");
         OptionBuilder.hasArg();
         OptionBuilder.withArgName("ADDRESS[:PORT]");
         OptionBuilder.withDescription("bind SLF4Fx server to this address");
-        controlGroup.addOption(OptionBuilder.create('b'));
+        options.addOption(OptionBuilder.create('b'));
 
         OptionBuilder.withLongOpt("session-timeout");
         OptionBuilder.hasArg();
         OptionBuilder.withArgName("TIMEOUT");
         OptionBuilder.withDescription("session timeout in seconds");
-        controlGroup.addOption(OptionBuilder.create('t'));
+        options.addOption(OptionBuilder.create('t'));
 
         OptionBuilder.withLongOpt("policy-file");
         OptionBuilder.hasArg();
         OptionBuilder.withArgName("FILE");
         OptionBuilder.withDescription("socket policy file for Adobe Flash Player");
-        controlGroup.addOption(OptionBuilder.create('p'));
+        options.addOption(OptionBuilder.create('p'));
 
         OptionBuilder.withLongOpt("reader-buffer-size");
         OptionBuilder.hasArg();
         OptionBuilder.withArgName("BYTES");
         OptionBuilder.withDescription("protocol decoder buffer size");
-        controlGroup.addOption(OptionBuilder.create('r'));
+        options.addOption(OptionBuilder.create('r'));
 
         OptionBuilder.withLongOpt("known-applications");
         OptionBuilder.hasArg();
         OptionBuilder.withArgName("FILE");
         OptionBuilder.withDescription("known applications descriptor file" +
                 "(one pair APPLICATION=SECRET per line)");
-        controlGroup.addOption(OptionBuilder.create('k'));
+        options.addOption(OptionBuilder.create('k'));
 
-        final OptionGroup helpGroup = new OptionGroup();
-        helpGroup.addOption(new Option("h", "help", false, "print this message"));
+        options.addOption(new Option("h", "help", false, "print this message"));
 
-        return new Options()
-                .addOptionGroup(helpGroup)
-                .addOptionGroup(controlGroup);
+        return options;
     }
 
     private static Map<String, String> loadKnownApplications(final File file) {
