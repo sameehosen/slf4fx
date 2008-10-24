@@ -99,6 +99,7 @@ public class Slf4FxLoggingTarget extends AbstractTarget
         _socket.writeUTF(ILogger(event.target).category);
         _socket.writeInt(convertToSlf4jLevel(event.level));
         _socket.writeUTF(event.message);
+        _socket.flush();
     }
 
     private function addPendingLogEvent(event:LogEvent) : void {
@@ -137,6 +138,7 @@ public class Slf4FxLoggingTarget extends AbstractTarget
         _socket.writeByte(_MSG_ACCESS_REQUEST);
         _socket.writeUTF(_applicationName);
         _socket.writeUTF(_secret);
+        _socket.flush();        
         _currentState = _STATE_WAITING_ACCESS_RESPONSE;
     }
 
