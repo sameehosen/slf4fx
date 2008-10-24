@@ -17,5 +17,6 @@ while [ -h "$PRG" ] ; do
 done
 
 SLF4FX_HOME=`dirname "$PRG"`
-cd ${CURRENT_DIR}
+cd "${SLF4FX_HOME}"
 java -jar "${SLF4FX_HOME}/slf4fx-server.jar" -p "${SLF4FX_HOME}/crossdomain.xml" 
+cd "${CURRENT_DIR}"
