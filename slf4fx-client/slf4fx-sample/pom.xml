@@ -19,7 +19,7 @@
     <parent>
         <groupId>org.room13.slf4fx</groupId>
         <artifactId>slf4fx-client</artifactId>
-        <version>1.3-SNAPSHOT</version>
+        <version>1.3</version>
     </parent>
 
     <packaging>swf</packaging>
