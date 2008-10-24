@@ -51,6 +51,16 @@
             </roles>
             <timezone>+3</timezone>
         </developer>
+        <developer>
+            <id>nkoksharov</id>
+            <name>Nikita Koksharov</name>
+            <organization>room13.org</organization>
+            <organizationUrl>http://room13.org</organizationUrl>
+            <roles>
+                <role>developer</role>
+            </roles>
+            <timezone>+3</timezone>
+        </developer>
     </developers>
 
     <scm>
