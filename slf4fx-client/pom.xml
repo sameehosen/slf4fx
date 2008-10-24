@@ -19,7 +19,7 @@
     <parent>
         <groupId>org.room13.slf4fx</groupId>
         <artifactId>slf4fx-project</artifactId>
-        <version>1.4</version>
+        <version>1.5-SNAPSHOT</version>
     </parent>
 
     <artifactId>slf4fx-client</artifactId>
