@@ -17,41 +17,50 @@ package org.room13.slf4fx;
 
 import org.apache.mina.core.buffer.IoBuffer;
 import org.apache.mina.core.session.IoSession;
-import org.apache.mina.filter.codec.ProtocolDecoderAdapter;
+import org.apache.mina.filter.codec.CumulativeProtocolDecoder;
 import org.apache.mina.filter.codec.ProtocolDecoderOutput;
 import org.room13.slf4fx.messages.AccessRequest;
 import org.room13.slf4fx.messages.AccessResponse;
 import org.room13.slf4fx.messages.LogRecordMessage;
 import org.room13.slf4fx.messages.PolicyFileRequest;
 
+import java.nio.BufferUnderflowException;
+
 /**
  * Reads the message type from input IoBuffer and pass the rest of
  * the buffer to message type instance if type is recognized.
  */
-public class SLF4FxProtocolDecoder extends ProtocolDecoderAdapter {
-    public void decode(IoSession session, IoBuffer in, ProtocolDecoderOutput out) throws Exception {
-        while (in.hasRemaining()) {
-            switch (Message.MessageType.valueOf(in.get())) {
-                case AccessRequest:
-                    out.write(new AccessRequest().read(in));
-                    break;
-                case AccessResponse:
-                    out.write(new AccessResponse().read(in));
-                    break;
-                case NewRecord:
-                    out.write(new LogRecordMessage().read(in));
-                    break;
-                case PolicyFileRequest:
-                    final PolicyFileRequest message = (PolicyFileRequest) new PolicyFileRequest().read(in);
-                    if (message.isValid()) {
-                        out.write(message);
-                        break;
-                    }
-                    throw new IllegalArgumentException("malformed policy file request");
-                case Unknown:
-                default:
-                    throw new UnsupportedOperationException("unsupported command");
+public class SLF4FxProtocolDecoder extends CumulativeProtocolDecoder {
+    protected boolean doDecode(final IoSession session, final IoBuffer in, final ProtocolDecoderOutput out) throws Exception {
+        final int start = in.position();
+        try {
+            if (in.hasRemaining()) {
+                switch (Message.MessageType.valueOf(in.get())) {
+                    case AccessRequest:
+                        out.write(new AccessRequest().read(in));
+                        return true;
+                    case AccessResponse:
+                        out.write(new AccessResponse().read(in));
+                        return true;
+                    case NewRecord:
+                        out.write(new LogRecordMessage().read(in));
+                        return true;
+                    case PolicyFileRequest:
+                        final PolicyFileRequest message = (PolicyFileRequest) new PolicyFileRequest().read(in);
+                        if (message.isValid()) {
+                            out.write(message);
+                            return true;
+                        }
+                        throw new IllegalArgumentException("malformed policy file request");
+                    case Unknown:
+                    default:
+                        throw new UnsupportedOperationException("unsupported command");
+                }
             }
+        } catch (BufferUnderflowException e) {
+            // ask for additional data;
         }
+        in.position(start);
+        return false;
     }
 }
