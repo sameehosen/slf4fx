@@ -1,0 +1,155 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+    Copyright 2008 Dmitry Motylev
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+        http://www.apache.org/licenses/LICENSE.txt-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+-->
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>org.room13.slf4fx</groupId>
+    <artifactId>slf4fx-project</artifactId>
+    <version>1.5</version>
+    <packaging>pom</packaging>
+    <name>slf4fx</name>
+
+    <description>
+        SLF4Fx is an open source suite of Flex3 logging target that send messages to slf4fx server.
+        The server writes all incoming messages to log using java Simple Logging Facade for Java (SLF4J).
+        SLF4Fx uses simple binary protocol to transfer log records between client and server.
+        It provides simple authentication mechanism that could be used to log specific application instance.
+    </description>
+
+    <licenses>
+        <license>
+            <name>Apache License Version 2.0, January 2004</name>
+            <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+            <distribution>manual</distribution>
+        </license>
+    </licenses>
+
+    <url>http://code.google.com/p/slf4fx/</url>
+
+    <developers>
+        <developer>
+            <id>dmotylev</id>
+            <name>Dmitry Motylev</name>
+            <organization>room13.org</organization>
+            <organizationUrl>http://room13.org</organizationUrl>
+            <roles>
+                <role>architect</role>
+                <role>developer</role>
+            </roles>
+            <timezone>+3</timezone>
+        </developer>
+        <developer>
+            <id>nkoksharov</id>
+            <name>Nikita Koksharov</name>
+            <organization>room13.org</organization>
+            <organizationUrl>http://room13.org</organizationUrl>
+            <roles>
+                <role>developer</role>
+            </roles>
+            <timezone>+3</timezone>
+        </developer>
+    </developers>
+
+    <scm>
+        <developerConnection>scm:svn:https://slf4fx.googlecode.com/svn/tags/slf4fx-project-1.5</developerConnection>
+    </scm>
+
+    <issueManagement>
+        <system>Issues on Google Code</system>
+        <url>http://code.google.com/p/slf4fx/issues/list</url>
+    </issueManagement>
+
+    <distributionManagement>
+        <repository>
+            <id>internal</id>
+            <url>http://maven/internal</url>
+        </repository>
+    </distributionManagement>
+
+    <modules>
+        <module>slf4fx-server</module>
+        <module>slf4fx-client</module>
+    </modules>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <encoding>UTF-8</encoding>
+                    <source>1.5</source>
+                    <target>1.5</target>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>org.slf4j</groupId>
+                <artifactId>slf4j-api</artifactId>
+                <version>1.5.2</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.mina</groupId>
+                <artifactId>mina-core</artifactId>
+                <version>2.0.0-M3</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.mina</groupId>
+                <artifactId>mina-statemachine</artifactId>
+                <version>2.0.0-M3</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.mina</groupId>
+                <artifactId>mina-integration-beans</artifactId>
+                <version>2.0.0-M3</version>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework</groupId>
+                <artifactId>spring-context</artifactId>
+                <version>2.5.5</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.slf4j</groupId>
+                <artifactId>slf4j-log4j12</artifactId>
+                <version>1.5.2</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>log4j</groupId>
+                <artifactId>log4j</artifactId>
+                <version>1.2.14</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.testng</groupId>
+                <artifactId>testng</artifactId>
+                <version>5.8</version>
+                <classifier>jdk15</classifier>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>commons-cli</groupId>
+                <artifactId>commons-cli</artifactId>
+                <version>1.1</version>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+</project>
