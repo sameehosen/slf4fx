@@ -56,7 +56,7 @@ public class Slf4FxLoggingTarget extends AbstractTarget
 
     private var _currentState : uint = _STATE_DISCONNECTED;
 
-    private static const _MAX_PENDING_MESSAGES : int = 100;
+    private static const _MAX_PENDING_MESSAGES : int = 1000;
     private var _pendingLogEvents : Array = new Array();
 
     /**
