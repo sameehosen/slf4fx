@@ -18,7 +18,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.room13.slf4fx</groupId>
     <artifactId>slf4fx-project</artifactId>
-    <version>1.7</version>
+    <version>1.8-SNAPSHOT</version>
     <packaging>pom</packaging>
     <name>slf4fx</name>
 
@@ -64,7 +64,7 @@
     </developers>
 
     <scm>
-        <developerConnection>scm:svn:https://slf4fx.googlecode.com/svn/tags/slf4fx-project-1.7</developerConnection>
+        <developerConnection>scm:svn:https://slf4fx.googlecode.com/svn/trunk</developerConnection>
     </scm>
 
     <issueManagement>
