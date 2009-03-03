@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="slf4fx distribution package builder" basedir="." default="dist">
+
+    <fileset id="slf4fx-server" file="slf4fx-server/dist/slf4fx-server.jar"/>
+    <fileset id="slf4fx-sample" file="slf4fx-client/slf4fx-sample/target/MyApplication.swf"/>
+    <fileset id="slf4fx-library" dir="slf4fx-client/slf4fx-library/target">
+        <include name="slf4fx-library-*.swc"/>
+    </fileset>
+
+    <target name="dist">
+        <condition property="IS_PROJECT_BUILT">
+            <and>
+                <available file="slf4fx-server/dist" type="dir"/>
+                <available file="slf4fx-client/slf4fx-sample/target" type="dir"/>
+                <available file="slf4fx-client/slf4fx-library/target" type="dir"/>
+            </and>
+        </condition>
+        <fail unless="IS_PROJECT_BUILT">you have to build project by maven before</fail>
+        <fail unless="VERSION">VERSION is not set</fail>
+        <delete dir="slf4fx-${VERSION}"/>
+        <mkdir dir="slf4fx-${VERSION}"/>
+        <copy todir="slf4fx-${VERSION}">
+            <fileset dir="dist-template">
+                <include name="**/*"/>
+            </fileset>
+        </copy>
+        <copy todir="slf4fx-${VERSION}">
+            <fileset refid="slf4fx-server"/>
+            <fileset refid="slf4fx-sample"/>
+        </copy>
+        <copy tofile="slf4fx-${VERSION}/slf4fx-library-${VERSION}.swc">
+            <fileset refid="slf4fx-library"/>
+        </copy>
+        <zip basedir="slf4fx-${VERSION}" file="slf4fx-${VERSION}-bin.zip" compress="true"/>
+        <delete dir="slf4fx-${VERSION}"/>
+    </target>
+</project>

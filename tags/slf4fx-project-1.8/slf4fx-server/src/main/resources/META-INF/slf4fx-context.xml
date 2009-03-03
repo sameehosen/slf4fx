@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+    Copyright 2008 Dmitry Motylev
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+        http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+-->
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd">
+
+    <!-- This makes it possible to specify java.net.SocketAddress values
+    (e.g. :1234 below) as Strings.
+    They will be converted into java.net.InetSocketAddress objects by Spring.  -->
+    <bean id="socketAddressEditor" class="org.apache.mina.integration.beans.InetSocketAddressEditor"/>
+
+    <bean class="org.springframework.beans.factory.config.CustomEditorConfigurer">
+        <property name="customEditors">
+            <map>
+                <entry key="java.net.SocketAddress" value-ref="socketAddressEditor"/>
+            </map>
+        </property>
+    </bean>
+
+    <bean id="messageSource"
+          class="org.springframework.context.support.ResourceBundleMessageSource">
+        <property name="basenames">
+            <list>
+                <value>version</value>
+            </list>
+        </property>
+    </bean>
+
+    <bean id="stateMachine" class="org.room13.slf4fx.SLF4FxStateMachine">
+        <property name="sessionTimeout" value="60"/>
+        <property name="readerBufferSize" value="1024"/>
+    </bean>
+
+    <!-- if you have to restrict access to known applications only
+    <bean id="stateMachine" class="org.room13.slf4fx.SLF4FxStateMachine">
+        <property name="knownApplicaions">
+            <map>
+                <entry key="myApplication" value="mySecret"/>
+            </map>
+        </property>
+    </bean>
+    -->
+
+    <bean id="codecFilter" class="org.apache.mina.filter.codec.ProtocolCodecFilter">
+        <constructor-arg>
+            <bean class="org.room13.slf4fx.SLF4FxProtocolEncoder"/>
+        </constructor-arg>
+        <constructor-arg>
+            <bean class="org.room13.slf4fx.SLF4FxProtocolDecoder"/>
+        </constructor-arg>
+    </bean>
+
+    <bean id="filterChainBuilder" class="org.apache.mina.core.filterchain.DefaultIoFilterChainBuilder">
+        <property name="filters">
+            <map>
+                <entry key="codec" value-ref="codecFilter"/>
+            </map>
+        </property>
+    </bean>
+
+    <bean id="serverHandler" class="org.apache.mina.core.service.IoHandlerAdapter"
+          factory-bean="stateMachine" factory-method="createIoHandler"/>
+
+    <bean id="ioAcceptor" class="org.apache.mina.transport.socket.nio.NioSocketAcceptor">
+        <property name="defaultLocalAddress" value="localhost:18888"/>
+        <property name="handler" ref="serverHandler"/>
+        <property name="reuseAddress" value="true"/>
+        <property name="filterChainBuilder" ref="filterChainBuilder"/>
+        <property name="closeOnDeactivation" value="true"/>
+    </bean>
+
+</beans>
