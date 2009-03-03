@@ -74,8 +74,8 @@
 
     <distributionManagement>
         <repository>
-            <id>internal</id>
-            <url>http://maven.2reallife.net/content/repositories/internal</url>
+            <id>internal-releases</id>
+            <url>http://maven.2reallife.net/content/repositories/internal-releases</url>
         </repository>
     </distributionManagement>
 
