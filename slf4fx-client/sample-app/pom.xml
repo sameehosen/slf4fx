@@ -44,7 +44,7 @@
     <dependencies>
         <dependency>
             <groupId>org.room13.slf4fx</groupId>
-            <artifactId>slf4fx-library</artifactId>
+            <artifactId>slf4fx</artifactId>
             <version>${project.parent.version}</version>
             <type>swc</type>
         </dependency>

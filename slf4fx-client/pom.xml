@@ -27,8 +27,8 @@
     <packaging>pom</packaging>
 
     <modules>
-        <module>slf4fx-library</module>
-        <module>slf4fx-sample</module>
+        <module>slf4fx</module>
+        <module>sample-app</module>
     </modules>
 
     <build>

@@ -2,8 +2,8 @@
 <project name="slf4fx distribution package builder" basedir="." default="dist">
 
     <fileset id="slf4fx-server" file="slf4fx-server/dist/slf4fx-server.jar"/>
-    <fileset id="slf4fx-sample" file="slf4fx-client/slf4fx-sample/target/MyApplication.swf"/>
-    <fileset id="slf4fx-library" dir="slf4fx-client/slf4fx-library/target">
+    <fileset id="slf4fx-sample" file="slf4fx-client/sample-app/target/MyApplication.swf"/>
+    <fileset id="slf4fx-library" dir="slf4fx-client/slf4fx/target">
         <include name="slf4fx-library-*.swc"/>
     </fileset>
 
@@ -11,8 +11,8 @@
         <condition property="IS_PROJECT_BUILT">
             <and>
                 <available file="slf4fx-server/dist" type="dir"/>
-                <available file="slf4fx-client/slf4fx-sample/target" type="dir"/>
-                <available file="slf4fx-client/slf4fx-library/target" type="dir"/>
+                <available file="slf4fx-client/sample-app/target" type="dir"/>
+                <available file="slf4fx-client/slf4fx/target" type="dir"/>
             </and>
         </condition>
         <fail unless="IS_PROJECT_BUILT">you have to build project by maven before</fail>
