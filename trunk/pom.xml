@@ -64,7 +64,7 @@
     </developers>
 
     <scm>
-        <developerConnection>scm:svn:https://slf4fx.googlecode.com/svn/tags/slf4fx-project-1.10</developerConnection>
+        <developerConnection>scm:svn:https://slf4fx.googlecode.com/svn/branches/slf4fx-project-1.10</developerConnection>
     </scm>
 
     <issueManagement>
