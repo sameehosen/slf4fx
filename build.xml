@@ -4,7 +4,7 @@
     <fileset id="slf4fx-server" file="slf4fx-server/dist/slf4fx-server.jar"/>
     <fileset id="slf4fx-sample" file="slf4fx-client/sample-app/target/MyApplication.swf"/>
     <fileset id="slf4fx-library" dir="slf4fx-client/slf4fx/target">
-        <include name="slf4fx-library-*.swc"/>
+        <include name="slf4fx-*.swc"/>
     </fileset>
 
     <target name="dist">
@@ -28,7 +28,7 @@
             <fileset refid="slf4fx-server"/>
             <fileset refid="slf4fx-sample"/>
         </copy>
-        <copy tofile="slf4fx-${VERSION}/slf4fx-library-${VERSION}.swc">
+        <copy tofile="slf4fx-${VERSION}/slf4fx-${VERSION}.swc">
             <fileset refid="slf4fx-library"/>
         </copy>
         <zip basedir="slf4fx-${VERSION}" file="slf4fx-${VERSION}-bin.zip" compress="true"/>
