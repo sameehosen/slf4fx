@@ -34,36 +34,80 @@
     <build>
         <sourceDirectory>src/main/flex</sourceDirectory>
         <testSourceDirectory>src/test/flex</testSourceDirectory>
-        <outputDirectory>${project.build.directory}/flex-compiler</outputDirectory>
+        <resources>
+            <resource>
+                <directory>src/main/resources</directory>
+                <filtering>false</filtering>
+            </resource>
+        </resources>
+
         <plugins>
             <plugin>
-                <groupId>info.flex-mojos</groupId>
-                <artifactId>flex-compiler-mojo</artifactId>
+                <groupId>org.sonatype.flexmojos</groupId>
+                <artifactId>flexmojos-maven-plugin</artifactId>
                 <extensions>true</extensions>
                 <configuration>
+                    <configurationReport>true</configurationReport>
+                    <quick>true</quick>
                     <debug>true</debug>
+                    <headlessServer>true</headlessServer>
                     <includeSources>
                         <param>${project.build.sourceDirectory}</param>
                     </includeSources>
-                    <locales>
-                        <param>en_US</param>
-                    </locales>
+                    <targetPlayer>9.0.115</targetPlayer>
                 </configuration>
-            </plugin>
-            <plugin>
-                <groupId>info.flex-mojos</groupId>
-                <artifactId>asdoc-mojo</artifactId>
             </plugin>
         </plugins>
     </build>
+
+    <repositories>
+        <repository>
+            <id>forge</id>
+            <url>http://repository.sonatype.org/content/groups/public</url>
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+        </repository>
+    </repositories>
+
+    <pluginRepositories>
+        <pluginRepository>
+            <id>forge</id>
+            <url>http://repository.sonatype.org/content/groups/public</url>
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+        </pluginRepository>
+    </pluginRepositories>
 
     <dependencies>
         <dependency>
             <groupId>com.adobe.flex.framework</groupId>
             <artifactId>flex-framework</artifactId>
-            <version>3.3.0</version>
+            <version>3.3.0.4852</version>
             <type>pom</type>
-            <optional>true</optional>
+        </dependency>
+
+        <dependency>
+            <groupId>com.adobe.flex.framework</groupId>
+            <artifactId>framework</artifactId>
+            <version>3.3.0.4852</version>
+            <type>swc</type>
+            <scope>caching</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>com.adobe.flex.framework</groupId>
+            <artifactId>rpc</artifactId>
+            <version>3.3.0.4852</version>
+            <type>swc</type>
+            <scope>caching</scope>
         </dependency>
     </dependencies>
 </project>

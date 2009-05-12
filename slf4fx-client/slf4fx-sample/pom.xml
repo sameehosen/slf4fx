@@ -29,8 +29,9 @@
     <build>
         <plugins>
             <plugin>
-                <groupId>info.rvin.mojo</groupId>
-                <artifactId>flex-compiler-mojo</artifactId>
+                <groupId>org.sonatype.flexmojos</groupId>
+                <artifactId>flexmojos-maven-plugin</artifactId>
+                <extensions>true</extensions>
                 <configuration>
                     <debug>false</debug>
                     <sourceFile>MyApplication.mxml</sourceFile>
@@ -46,7 +47,6 @@
             <artifactId>slf4fx-library</artifactId>
             <version>${project.parent.version}</version>
             <type>swc</type>
-            <scope>internal</scope>
         </dependency>
     </dependencies>
 </project>
