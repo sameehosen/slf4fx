@@ -23,7 +23,7 @@
     </parent>
 
     <packaging>swc</packaging>
-    <artifactId>slf4fx-library</artifactId>
+    <artifactId>slf4fx</artifactId>
     <name>slf4fx :: flex :: library</name>
 
     <build>
