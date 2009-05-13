@@ -15,72 +15,86 @@
  */
 package org.room13.slf4fx;
 
-import org.apache.commons.cli.*;
-import org.apache.mina.core.service.IoAcceptor;
-import org.apache.mina.integration.beans.InetSocketAddressEditor;
+import org.apache.mina.core.filterchain.DefaultIoFilterChainBuilder;
+import org.apache.mina.filter.codec.ProtocolCodecFilter;
+import org.apache.mina.transport.socket.nio.NioSocketAcceptor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 import java.io.*;
+import java.net.InetSocketAddress;
 import java.net.SocketAddress;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 
 /**
- * Bootstrap class for SLF4Fx server.
+ * SLF4Fx server.
+ * <p/>
+ * By default server binds to localhost:18888 with reader buffer size of 1024 bytes,
+ * default session timeout is 60 seconds and server does not known any credentials (accepts any).
  */
 public class SLF4FxServer {
     private static final Logger _log = LoggerFactory.getLogger(SLF4FxServer.class);
+    private SocketAddress _defaultLocalAddress = new InetSocketAddress("localhost", 18888);
+    private int _sessionTimeout = 60;
+    private int _readerBufferSize = 1024;
+    private Map<String, String> _credentials = new HashMap<String, String>();
+    private String _flexPolicyResponse = null;
+    private NioSocketAcceptor _acceptor = null;
 
-    private static Options buildOptions() {
-        final Options options = new Options();
-        OptionBuilder.withLongOpt("bind");
-        OptionBuilder.hasArg();
-        OptionBuilder.withArgName("ADDRESS[:PORT]");
-        OptionBuilder.withDescription("bind SLF4Fx server to this address");
-        options.addOption(OptionBuilder.create('b'));
-
-        OptionBuilder.withLongOpt("session-timeout");
-        OptionBuilder.hasArg();
-        OptionBuilder.withArgName("TIMEOUT");
-        OptionBuilder.withDescription("session timeout in seconds");
-        options.addOption(OptionBuilder.create('t'));
-
-        OptionBuilder.withLongOpt("policy-file");
-        OptionBuilder.hasArg();
-        OptionBuilder.withArgName("FILE");
-        OptionBuilder.withDescription("socket policy file for Adobe Flash Player");
-        options.addOption(OptionBuilder.create('p'));
-
-        OptionBuilder.withLongOpt("reader-buffer-size");
-        OptionBuilder.hasArg();
-        OptionBuilder.withArgName("BYTES");
-        OptionBuilder.withDescription("protocol decoder buffer size");
-        options.addOption(OptionBuilder.create('r'));
-
-        OptionBuilder.withLongOpt("known-applications");
-        OptionBuilder.hasArg();
-        OptionBuilder.withArgName("FILE");
-        OptionBuilder.withDescription("known applications descriptor file" +
-                "(one pair APPLICATION=SECRET per line)");
-        options.addOption(OptionBuilder.create('k'));
-
-        options.addOption(new Option("h", "help", false, "print this message"));
-
-        return options;
+    public void setDefaultLocalAddress(final SocketAddress aDefaultLocalAddress) {
+        _defaultLocalAddress = aDefaultLocalAddress;
     }
 
-    private static Map<String, String> loadKnownApplications(final File file) {
+    public SocketAddress getDefaultLocalAddress() {
+        return _defaultLocalAddress;
+    }
+
+    public void setSessionTimeout(final int aSessionTimeout) {
+        _sessionTimeout = aSessionTimeout;
+    }
+
+    public int getSessionTimeout() {
+        return _sessionTimeout;
+    }
+
+    public void setReaderBufferSize(final int aReaderBufferSize) {
+        _readerBufferSize = aReaderBufferSize;
+    }
+
+    public int getReaderBufferSize() {
+        return _readerBufferSize;
+    }
+
+    public void setCredentials(final Map<String, String> aCredentials) {
+        _credentials = aCredentials;
+    }
+
+    public Map<String, String> getCredentials() {
+        return _credentials;
+    }
+
+    public void setFlexPolicyResponse(final String aFlexPolicyResponse) {
+        _flexPolicyResponse = aFlexPolicyResponse;
+    }
+
+    public String getFlexPolicyResponse() {
+        return _flexPolicyResponse;
+    }
+
+    /**
+     * Set credentials from given properties file
+     *
+     * @param file properties file with applications credentials
+     * @throws IOException in case of any IO error
+     */
+    public void setCredentials(final File file) throws IOException {
         final Properties props = new Properties();
         InputStream istream = null;
         try {
             istream = new FileInputStream(file);
             props.load(istream);
-        } catch (Exception e) {
-            _log.warn("failed to load known application descriptor", e);
         } finally {
             if (istream != null)
                 try {
@@ -94,10 +108,16 @@ public class SLF4FxServer {
         for (final Object key : props.keySet()) {
             map.put(String.valueOf(key), props.getProperty(String.valueOf(key)));
         }
-        return map;
+        setCredentials(map);
     }
 
-    private static String loadPolicyFile(final File file) {
+    /**
+     * Set response for flex &lt;policy-file-request/&gt; from given file.
+     *
+     * @param file text file with response
+     * @throws IOException in case of any IO error
+     */
+    public void setFlexPolicyResponse(final File file) throws IOException {
         Reader reader = null;
         try {
             reader = new FileReader(file);
@@ -106,10 +126,7 @@ public class SLF4FxServer {
             for (int size; (size = reader.read(buffer)) != -1;) {
                 sb.append(buffer, 0, size);
             }
-            return sb.toString();
-        } catch (Exception e) {
-            _log.warn("failed to load policy file", e);
-            return null;
+            setFlexPolicyResponse(sb.toString());
         } finally {
             if (reader != null)
                 try {
@@ -120,79 +137,45 @@ public class SLF4FxServer {
         }
     }
 
-    public static void main(String[] args) {
+    public void start() throws IOException {
         final long startTime = System.currentTimeMillis();
-        final Options options = buildOptions();
-        final CommandLineParser parser = new GnuParser();
 
-        try {
-            final ApplicationContext context = new ClassPathXmlApplicationContext("/META-INF/slf4fx-context.xml");
+        _log.info("default local address: {}", _defaultLocalAddress);
+        _log.info("session timeout: {} seconds", _sessionTimeout);
+        _log.info("reader buffer size: {} bytes", _readerBufferSize);
+        _log.info("known credentials: {}", _credentials.keySet());
+        _log.info("<policy-file-request/> response: {}",
+                _flexPolicyResponse == null ? "disabled" : _flexPolicyResponse);
 
-            CommandLine commandLine = parser.parse(options, args);
-            if (commandLine.hasOption("help")) {
-                HelpFormatter formatter = new HelpFormatter();
-                formatter.setWidth(80);
-                formatter.printHelp(
-                        "java -jar slf4fx-server.jar [OPTIONS]",
-                        String.format("Version %s",context.getMessage("slf4fx.version", null, null)),
-                        options,
-                        "",
-                        false
-                );
-                System.exit(1);
-            }
+        final DefaultIoFilterChainBuilder filterChainBuilder = new DefaultIoFilterChainBuilder();
+        filterChainBuilder.addLast("codec", new ProtocolCodecFilter(
+                SLF4FxProtocolEncoder.class,
+                SLF4FxProtocolDecoder.class));
 
-            _log.info("slf4fx (version {})", context.getMessage("slf4fx.version", null, null));
+        final SLF4FxStateMachine stateMachine = new SLF4FxStateMachine();
+        stateMachine.setSessionTimeout(getSessionTimeout());
+        stateMachine.setReaderBufferSize(getReaderBufferSize());
+        stateMachine.setCredentials(getCredentials());
+        stateMachine.setFlexPolicyResponse(getFlexPolicyResponse());
 
-            final IoAcceptor acceptor = (IoAcceptor) context.getBean("ioAcceptor");
-            final SLF4FxStateMachine stateMachine = (SLF4FxStateMachine) context.getBean("stateMachine");
+        _acceptor = new NioSocketAcceptor();
+        _acceptor.setHandler(stateMachine.createIoHandler());
+        _acceptor.setFilterChainBuilder(filterChainBuilder);
+        _acceptor.setReuseAddress(true);
+        _acceptor.setCloseOnDeactivation(true);
+        _acceptor.setDefaultLocalAddress(getDefaultLocalAddress());
 
-            if (commandLine.hasOption("session-timeout")) {
-                stateMachine.setSessionTimeout(Integer.parseInt(commandLine.getOptionValue("session-timeout")));
-            }
-            _log.info("session timeout is {} seconds", stateMachine.getSessionTimeout());
-
-            if (commandLine.hasOption("reader-buffer-size")) {
-                stateMachine.setReaderBufferSize(Integer.parseInt(commandLine.getOptionValue("reader-buffer-size")));
-            }
-            _log.info("reader buffer size is {}", stateMachine.getReaderBufferSize());
-
-            if (commandLine.hasOption("known-applications")) {
-                final File file = new File(commandLine.getOptionValue("known-applications"));
-                _log.info("loading known applications from {}", file.getAbsolutePath());
-                stateMachine.setKnownApplicaions(loadKnownApplications(file));
-            }
-            _log.info("known applications {}", stateMachine.getKnownApplicaions().keySet());
-
-            if (commandLine.hasOption("policy-file")) {
-                final File file = new File(commandLine.getOptionValue("policy-file"));
-                _log.info("loading policy file from {}", file.getAbsolutePath());
-                stateMachine.setPolicyContent(loadPolicyFile(file));
-            }
-            _log.info("support for <policy-file-request/> is {}",
-                    stateMachine.getPolicyContent() == null ? "disabled" : "enabled");
-
-            if (commandLine.hasOption("bind")) {
-                final InetSocketAddressEditor editor = (InetSocketAddressEditor) context.getBean("socketAddressEditor");
-                editor.setAsText(commandLine.getOptionValue("bind"));
-                acceptor.setDefaultLocalAddress((SocketAddress) editor.getValue());
-            }
-            _log.info("listen {}", acceptor.getDefaultLocalAddress());
-
-            Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {
-                public void run() {
-                    acceptor.unbind();
-                    _log.info("server stopped");
-                }
-            }));
-
-            acceptor.bind();
-            _log.info("server started in {}ms", System.currentTimeMillis() - startTime);
-        } catch (IOException e) {
-            _log.error("failed to start slf4fx server", e);
-        } catch (ParseException e) {
-            _log.error("failed to parse command line", e);
-        }
+        _acceptor.bind();
+        _log.info("slf4fx server started in {} ms", System.currentTimeMillis() - startTime);
     }
 
+    public void stop() {
+        if (_acceptor == null) {
+            return;
+        }
+        if (_acceptor.isActive()) {
+            _acceptor.unbind();
+        }
+        _log.info("server stopped");
+    }
 }

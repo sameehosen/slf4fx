@@ -4,4 +4,4 @@ The server writes all incoming messages to log using java Simple Logging Facade 
 SLF4Fx uses simple binary protocol to transfer log records between client and server.
 It provides simple authentication mechanism that could be used to log specific application instance.
 
-See http://code.google.com/p/slf4fx/wiki/PackageOverview for further details.
+See http://code.google.com/p/slf4fx further details.

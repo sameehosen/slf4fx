@@ -1,0 +1,33 @@
+#
+# Copyright (C) 2009 Dmitry Motylev
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE.txt-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+log4j.rootLogger=info, CONSOLE
+
+log4j.appender.CONSOLE=org.apache.log4j.ConsoleAppender
+log4j.appender.CONSOLE.layout=org.apache.log4j.PatternLayout
+log4j.appender.CONSOLE.layout.ConversionPattern=%d{HH:mm:ss.SSS} %-5p %c{1} : %m%n
+
+log4j.appender.FILE=org.apache.log4j.FileAppender
+log4j.appender.FILE.File=slf4fx-client.log
+# on my mac I'd prefer to have all development logs in one place and use console to watch them together
+#log4j.appender.FILE.File=${user.home}/Library/Logs/Development/slf4fx-client.log
+log4j.appender.FILE.append=false
+log4j.appender.FILE.layout=org.apache.log4j.PatternLayout
+log4j.appender.FILE.layout.ConversionPattern=%d{yyyy.MM.dd HH:mm:ss.SSS} %-5p %c : %m%n
+
+# You may configure logger for any application
+log4j.logger.slf4fx=DEBUG, FILE
+# and/or you may configure logger for particular application(-s)
+#log4j.logger.slf4fx.myApplication=INFO, FILE

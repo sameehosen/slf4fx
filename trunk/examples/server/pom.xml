@@ -23,7 +23,7 @@
         <version>1.11-SNAPSHOT</version>
     </parent>
 
-    <artifactId>slf4fx-simple-server</artifactId>
+    <artifactId>slf4fx-server</artifactId>
     <packaging>jar</packaging>
     <name>slf4fx :: examples :: simple server</name>
 
@@ -31,7 +31,7 @@
         <resources>
             <resource>
                 <directory>src/main/resources</directory>
-                <filtering>true</filtering>
+                <filtering>false</filtering>
             </resource>
         </resources>
         <plugins>
@@ -46,18 +46,14 @@
                     </execution>
                 </executions>
                 <configuration>
-                    <finalName>${project.artifactId}</finalName>
-                    <outputDirectory>dist</outputDirectory>
-                    <appendAssemblyId>false</appendAssemblyId>
-                    <attach>false</attach>
                     <ignoreDirFormatExtensions>true</ignoreDirFormatExtensions>
                     <descriptors>
-                        <descriptor>src/main/etc/assembly-with-dependencies.xml</descriptor>
+                        <descriptor>src/main/etc/assembly-deps.xml</descriptor>
                     </descriptors>
                     <archive>
                         <index>true</index>
                         <manifest>
-                            <mainClass>org.room13.slf4fx.SLF4FxServer</mainClass>
+                            <mainClass>org.room13.slf4fx.Main</mainClass>
                         </manifest>
                     </archive>
                 </configuration>
@@ -69,7 +65,7 @@
                     <archive>
                         <index>true</index>
                         <manifest>
-                            <mainClass>org.room13.slf4fx.SLF4FxServer</mainClass>
+                            <mainClass>org.room13.slf4fx.Main</mainClass>
                         </manifest>
                     </archive>
                 </configuration>
@@ -78,28 +74,14 @@
     </build>
     <dependencies>
         <dependency>
-            <groupId>org.apache.mina</groupId>
-            <artifactId>mina-core</artifactId>
+            <groupId>org.room13.slf4fx</groupId>
+            <artifactId>slf4fx_server</artifactId>
             <scope>compile</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.mina</groupId>
-            <artifactId>mina-statemachine</artifactId>
-            <scope>compile</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.mina</groupId>
-            <artifactId>mina-integration-beans</artifactId>
-            <scope>compile</scope>
+            <version>${project.parent.version}</version>
         </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
-            <scope>compile</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-context</artifactId>
             <scope>compile</scope>
         </dependency>
         <dependency>
@@ -110,12 +92,12 @@
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-log4j12</artifactId>
-            <scope>provided</scope>
+            <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>log4j</groupId>
             <artifactId>log4j</artifactId>
-            <scope>provided</scope>
+            <scope>compile</scope>
         </dependency>
 
         <dependency>

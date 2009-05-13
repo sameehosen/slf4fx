@@ -1,5 +1,5 @@
 <assembly>
-    <id>with-dependencies</id>
+    <id>deps</id>
     <formats>
         <format>jar</format>
     </formats>
@@ -15,10 +15,6 @@
             <outputFileNameMapping/>
             <unpack>true</unpack>
             <scope>provided</scope>
-            <excludes>
-                <exclude>org.slf4j:slf4j-api</exclude>
-                <exclude>org.room13.slf4fx:slf4fx-server</exclude>
-            </excludes>
         </dependencySet>
     </dependencySets>
 </assembly>
