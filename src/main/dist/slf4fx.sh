@@ -18,5 +18,5 @@ done
 
 SLF4FX_HOME=`dirname "$PRG"`
 cd "${SLF4FX_HOME}"
-java -jar "${SLF4FX_HOME}/slf4fx-server.jar" -p "${SLF4FX_HOME}/crossdomain.xml" 
+java -jar "${SLF4FX_HOME}/slf4fx-server-deps.jar"
 cd "${CURRENT_DIR}"

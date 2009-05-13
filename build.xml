@@ -1,37 +1,94 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project name="slf4fx distribution package builder" basedir="." default="dist">
+<project name="slf4fx distribution package builder" basedir="." default="dist"
+         xmlns:artifact="antlib:org.apache.maven.artifact.ant">
 
-    <fileset id="slf4fx-server" file="slf4fx-server/dist/slf4fx-server.jar"/>
-    <fileset id="slf4fx-sample" file="slf4fx-client/sample-app/target/MyApplication.swf"/>
-    <fileset id="slf4fx-library" dir="slf4fx-client/slf4fx/target">
-        <include name="slf4fx-*.swc"/>
+    <property name="verbose" value="false"/>
+    <property name="output.dir" value="target"/>
+    <property name="stage.dir" value="${output.dir}/stage"/>
+
+    <fileset id="fileset:dist" dir="src/main/dist">
+        <include name="**/*"/>
     </fileset>
 
-    <target name="dist">
-        <condition property="IS_PROJECT_BUILT">
-            <and>
-                <available file="slf4fx-server/dist" type="dir"/>
-                <available file="slf4fx-client/sample-app/target" type="dir"/>
-                <available file="slf4fx-client/slf4fx/target" type="dir"/>
-            </and>
-        </condition>
-        <fail unless="IS_PROJECT_BUILT">you have to build project by maven before</fail>
-        <fail unless="VERSION">VERSION is not set</fail>
-        <delete dir="slf4fx-${VERSION}"/>
-        <mkdir dir="slf4fx-${VERSION}"/>
-        <copy todir="slf4fx-${VERSION}">
-            <fileset dir="dist-template">
-                <include name="**/*"/>
-            </fileset>
+    <!--
+    *** DEPENDENCIES SECTION ***
+
+    Define all required dependencies in this section.
+    Be aware that some unwanted artifacts would be copied to stage as transitive dependencies.
+    You can exclude transitive dependecies by declaring "exclusion"-s.
+    You can see full dependency-tree by running ant with "collect-dependencies" target and -Dverbose=true
+    -->
+
+    <target name="collect-dependencies">
+        <fail unless="project.version" message="'project.version' required"/>
+
+        <artifact:dependencies verbose="${verbose}"
+                               filesetId="fileset:deps:lib"
+                               versionsId="versions:deps:lib">
+            <dependency groupId="org.room13.slf4fx" artifactId="slf4fx_server" version="${project.version}">
+                <exclusion groupId="org.apache.mina" artifactId="mina-core"/>
+                <exclusion groupId="org.apache.mina" artifactId="mina-statemachine"/>
+                <exclusion groupId="org.apache.mina" artifactId="mina-integration-beans"/>
+                <exclusion groupId="org.slf4j" artifactId="slf4j-api"/>
+            </dependency>
+            <dependency groupId="org.room13.slf4fx" artifactId="slf4fx_client" version="${project.version}"
+                        type="swc">
+                <exclusion groupId="com.adobe.flex.framework" artifactId="flex-framework"/>
+            </dependency>
+        </artifact:dependencies>
+
+        <artifact:dependencies verbose="${verbose}"
+                               filesetId="fileset:deps:sample"
+                               versionsId="versions:deps:sample">
+            <dependency groupId="org.room13.slf4fx" artifactId="slf4fx-server" version="${project.version}"
+                        classifier="deps">
+                <exclusion groupId="commons-cli" artifactId="commons-cli"/>
+                <exclusion groupId="log4j" artifactId="log4j"/>
+                <exclusion groupId="org.slf4j" artifactId="slf4j-api"/>
+                <exclusion groupId="org.slf4j" artifactId="slf4j-log4j12"/>
+                <exclusion groupId="org.apache.mina" artifactId="mina-core"/>
+                <exclusion groupId="org.apache.mina" artifactId="mina-statemachine"/>
+                <exclusion groupId="org.apache.mina" artifactId="mina-integration-beans"/>
+                <exclusion groupId="org.room13.slf4fx" artifactId="slf4fx_server"/>
+            </dependency>
+            <dependency groupId="org.room13.slf4fx" artifactId="sample-client" version="${project.version}"
+                        type="swf">
+                <exclusion groupId="com.adobe.flex.framework" artifactId="flex-framework"/>
+                <exclusion groupId="org.room13.slf4fx" artifactId="slf4fx_client"/>
+            </dependency>
+        </artifact:dependencies>
+    </target>
+
+    <!-- END OF DEPENDENCIES SECTION -->
+
+    <target name="dist" depends="collect-dependencies">
+        <delete dir="${stage.dir}"/>
+        <mkdir dir="${stage.dir}"/>
+        <copy todir="${stage.dir}" overwrite="true" verbose="${verbose}">
+            <fileset refid="fileset:deps:sample"/>
+            <mapper classname="org.apache.maven.artifact.ant.VersionMapper"
+                    from="${versions:deps:sample}"
+                    to="flatten"/>
         </copy>
-        <copy todir="slf4fx-${VERSION}">
-            <fileset refid="slf4fx-server"/>
-            <fileset refid="slf4fx-sample"/>
+
+        <mkdir dir="${stage.dir}/lib"/>
+        <copy todir="${stage.dir}/lib" overwrite="true" verbose="${verbose}">
+            <fileset refid="fileset:deps:lib"/>
+            <mapper classname="org.apache.maven.artifact.ant.VersionMapper"
+                    from="${versions:deps:lib}"
+                    to="flatten"/>
         </copy>
-        <copy tofile="slf4fx-${VERSION}/slf4fx-${VERSION}.swc">
-            <fileset refid="slf4fx-library"/>
+
+        <copy todir="${stage.dir}" overwrite="true" verbose="${verbose}">
+            <fileset refid="fileset:dist"/>
         </copy>
-        <zip basedir="slf4fx-${VERSION}" file="slf4fx-${VERSION}-bin.zip" compress="true"/>
-        <delete dir="slf4fx-${VERSION}"/>
+
+        <chmod file="${stage.dir}/slf4fx.sh" perm="ugo+rx"/>
+
+        <zip basedir="${stage.dir}" file="slf4fx-${project.version}-bin.zip" compress="true"/>
+    </target>
+
+    <target name="clean">
+        <delete dir="${output.dir}"/>
     </target>
 </project>

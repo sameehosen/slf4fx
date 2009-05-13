@@ -24,7 +24,7 @@
     </parent>
 
     <packaging>swc</packaging>
-    <artifactId>slf4fx</artifactId>
+    <artifactId>slf4fx_client</artifactId>
     <name>slf4fx :: client library</name>
 
     <repositories>
@@ -55,13 +55,6 @@
 
     <build>
         <sourceDirectory>src/main/flex</sourceDirectory>
-        <testSourceDirectory>src/test/flex</testSourceDirectory>
-        <resources>
-            <resource>
-                <directory>src/main/resources</directory>
-                <filtering>false</filtering>
-            </resource>
-        </resources>
 
         <plugins>
             <plugin>
@@ -76,7 +69,9 @@
                     </execution>
                 </executions>
                 <configuration>
-                    <configurationReport>true</configurationReport>
+<!--
+                    <configurationReport>false</configurationReport>
+-->
                     <quick>true</quick>
                     <debug>true</debug>
                     <headlessServer>true</headlessServer>
@@ -95,22 +90,6 @@
             <artifactId>flex-framework</artifactId>
             <version>3.3.0.4852</version>
             <type>pom</type>
-        </dependency>
-
-        <dependency>
-            <groupId>com.adobe.flex.framework</groupId>
-            <artifactId>framework</artifactId>
-            <version>3.3.0.4852</version>
-            <type>swc</type>
-            <scope>external</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>com.adobe.flex.framework</groupId>
-            <artifactId>rpc</artifactId>
-            <version>3.3.0.4852</version>
-            <type>swc</type>
-            <scope>external</scope>
         </dependency>
     </dependencies>
 </project>

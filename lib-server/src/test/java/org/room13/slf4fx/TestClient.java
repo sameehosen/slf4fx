@@ -1,11 +1,11 @@
 /*
- * Copyright 2008 Dmitry Motylev
+ * Copyright (C) 2009 Dmitry Motylev
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE.txt-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -107,7 +107,7 @@ public class TestClient {
             return;
         }
         setAccessGranted(Boolean.FALSE);
-        session.close();
+        session.close(true);
     }
 
     public IoHandler getIoHandler() {
@@ -120,5 +120,9 @@ public class TestClient {
                         return new SLF4FxSessionContext();
                     }
                 })).create(IoHandler.class, stateMachine);
+    }
+
+    public TestLogger getLogger() {
+        return (TestLogger) _log;
     }
 }

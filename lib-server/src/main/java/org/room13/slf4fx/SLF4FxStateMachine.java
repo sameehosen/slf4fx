@@ -35,7 +35,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * TODO: Document the class
+ * Handles slf4fx protocol events.
  */
 public class SLF4FxStateMachine {
     private final Logger _log = LoggerFactory.getLogger(SLF4FxStateMachine.class);
@@ -45,9 +45,9 @@ public class SLF4FxStateMachine {
     public static final String HANDSHAKE = "HANDSHAKE";
     @State(ROOT)
     public static final String IDLE = "IDLE";
-    private Map<String, String> _knownApplicaions = new HashMap<String, String>();
+    private Map<String, String> _credentials = new HashMap<String, String>();
     private int _sessionTimeout = 30;
-    private String _policyContent = null;
+    private String _flexPolicyResponse = null;
     private int _readerBufferSize = 1024;
 
     public int getSessionTimeout() {
@@ -58,20 +58,20 @@ public class SLF4FxStateMachine {
         _sessionTimeout = sessionTimeout;
     }
 
-    public Map<String, String> getKnownApplicaions() {
-        return _knownApplicaions;
+    public Map<String, String> getCredentials() {
+        return _credentials;
     }
 
-    public void setKnownApplicaions(final Map<String, String> knownApplicaions) {
-        _knownApplicaions = knownApplicaions;
+    public void setCredentials(final Map<String, String> aCredentials) {
+        _credentials = aCredentials;
     }
 
-    public String getPolicyContent() {
-        return _policyContent;
+    public String getFlexPolicyResponse() {
+        return _flexPolicyResponse;
     }
 
-    public void setPolicyContent(final String policyContent) {
-        _policyContent = policyContent;
+    public void setFlexPolicyResponse(final String aFlexPolicyResponse) {
+        _flexPolicyResponse = aFlexPolicyResponse;
     }
 
     public int getReaderBufferSize() {
@@ -98,7 +98,7 @@ public class SLF4FxStateMachine {
     @IoHandlerTransition(on = EXCEPTION_CAUGHT, in = ROOT)
     public void exceptionCaught(final IoSession session, Throwable cause) {
         _log.error("exception caught {}({})", cause.getClass().getName(), cause.getMessage());
-        session.close();
+        session.close(true);
     }
 
     @IoHandlerTransition(on = SESSION_CREATED, in = ROOT)
@@ -122,22 +122,22 @@ public class SLF4FxStateMachine {
     @SuppressWarnings({"UnusedDeclaration"})
     @IoHandlerTransition(on = MESSAGE_RECEIVED, in = HANDSHAKE)
     public void onPolicyFileRequest(final IoSession session, final PolicyFileRequest command) {
-        if (_policyContent==null) {
+        if (_flexPolicyResponse ==null) {
             _log.warn("application has requested policy file but policy was not provided");
-            session.close();
+            session.close(true);
         }
         _log.info("socket policy file requested from {}",session.getRemoteAddress());
         final PolicyFileResponse response = new PolicyFileResponse();
-        response.setPolicyContent(_policyContent);
+        response.setPolicyContent(_flexPolicyResponse);
         session.write(response);
     }
 
     @SuppressWarnings({"SimplifiableIfStatement"})
     private boolean isApplicationKnown(final String applicationId, final String secret) {
-        if (_knownApplicaions.isEmpty())
+        if (_credentials.isEmpty())
             return true;
-        return _knownApplicaions.containsKey(applicationId)
-                && _knownApplicaions.get(applicationId).equals(secret);
+        return _credentials.containsKey(applicationId)
+                && _credentials.get(applicationId).equals(secret);
     }
 
     @IoHandlerTransition(on = MESSAGE_RECEIVED, in = IDLE)
@@ -168,7 +168,7 @@ public class SLF4FxStateMachine {
     @IoHandlerTransition(on = SESSION_IDLE, in = IDLE)
     public void onIdle(final SLF4FxSessionContext context, final IoSession session) {
         _log.info("inactive log session for application {} has been closed", context.getApplicationId());
-        session.close();
+        session.close(false);
     }
 
     public IoHandler createIoHandler() {

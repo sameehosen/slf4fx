@@ -15,24 +15,20 @@
  */
 package org.room13.slf4fx;
 
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
 import org.apache.mina.core.service.IoHandler;
 import org.apache.mina.filter.codec.ProtocolCodecFilter;
-import org.apache.mina.transport.socket.SocketAcceptor;
 import org.apache.mina.transport.socket.SocketConnector;
-import org.apache.mina.transport.socket.nio.NioSocketAcceptor;
 import org.apache.mina.transport.socket.nio.NioSocketConnector;
 import org.room13.slf4fx.messages.LogRecordMessage;
 import static org.room13.slf4fx.messages.LogRecordMessage.Level.*;
+import org.slf4j.LoggerFactory;
 import static org.testng.Assert.assertEquals;
+import org.testng.annotations.AfterTest;
 import org.testng.annotations.BeforeSuite;
 import org.testng.annotations.BeforeTest;
 import org.testng.annotations.Test;
 
 import java.io.IOException;
-import java.net.InetSocketAddress;
-import static java.util.Collections.EMPTY_SET;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -43,8 +39,8 @@ import java.util.Set;
  */
 @Test
 public class SLF4FxServerTest {
-    private static final int _PORT = 18888;
-    private final TestAppender _appender = new TestAppender();
+    private SLF4FxServer _server;
+    private TestLogger _testLogger;
 
     private LogRecordMessage newLogRecordMessage(final String category, final LogRecordMessage.Level level, final String message) {
         final LogRecordMessage logRecord = new LogRecordMessage();
@@ -56,24 +52,23 @@ public class SLF4FxServerTest {
 
     @BeforeSuite
     public void prepareLogger() {
-        Logger root = Logger.getRootLogger();
-        root.addAppender(_appender);
-        root.setLevel(Level.TRACE);
+        _testLogger = (TestLogger) LoggerFactory.getLogger("slf4fx.myApplication." + TestClient.class.getName());
     }
 
     @BeforeTest
     public void startServer() throws IOException {
-        final SocketAcceptor acceptor = new NioSocketAcceptor();
-        acceptor.getFilterChain().addLast("codec",
-                new ProtocolCodecFilter(SLF4FxProtocolEncoder.class, SLF4FxProtocolDecoder.class));
+        _server = new SLF4FxServer();
+
         final Map<String, String> credentials = new HashMap<String, String>();
         credentials.put("myApplication", "mySecret");
-        final SLF4FxStateMachine serverStateMachine = new SLF4FxStateMachine();
-        serverStateMachine.setKnownApplicaions(credentials);
-        acceptor.setHandler(serverStateMachine.createIoHandler());
-        acceptor.setReuseAddress(true);
-        final InetSocketAddress address = new InetSocketAddress(_PORT);
-        acceptor.bind(address);
+        _server.setCredentials(credentials);
+
+        _server.start();
+    }
+
+    @AfterTest
+    public void stopServer() {
+        _server.stop();
     }
 
     public SocketConnector newConnector(final IoHandler ioHandler) throws IOException {
@@ -84,12 +79,13 @@ public class SLF4FxServerTest {
         return connector;
     }
 
-    @SuppressWarnings({"unchecked"})
     @Test
     public void testAccessDenied() throws IOException {
-        final TestClient client = new TestClient("myApplication", "hisSecret", EMPTY_SET);
+        final Set<LogRecordMessage> expectations = new HashSet<LogRecordMessage>();
+        final TestClient client = new TestClient("myApplication", "hisSecret", expectations);
+
         final SocketConnector connector = newConnector(client.getIoHandler());
-        connector.connect(new InetSocketAddress(_PORT));
+        connector.connect(_server.getDefaultLocalAddress());
         try {
             // give a client chance to send data
             Thread.sleep(400);
@@ -99,12 +95,12 @@ public class SLF4FxServerTest {
         assertEquals(client.getAccessGranted(), Boolean.FALSE);
     }
 
-    @SuppressWarnings({"unchecked"})
     @Test
     public void testAccessGranted() throws IOException {
-        final TestClient client = new TestClient("myApplication", "mySecret", EMPTY_SET);
+        final Set<LogRecordMessage> expectations = new HashSet<LogRecordMessage>();
+        final TestClient client = new TestClient("myApplication", "mySecret", expectations);
         final SocketConnector connector = newConnector(client.getIoHandler());
-        connector.connect(new InetSocketAddress(_PORT));
+        connector.connect(_server.getDefaultLocalAddress());
         try {
             // give a client chance to send data
             Thread.sleep(400);
@@ -116,29 +112,30 @@ public class SLF4FxServerTest {
 
     @Test
     public void testLogging() throws IOException {
-        final Set<LogRecordMessage> messages = new HashSet<LogRecordMessage>();
-        messages.add(newLogRecordMessage("org.room13.slf4fx.TestClient", ERROR, "slf4fx log error message"));
-        messages.add(newLogRecordMessage("org.room13.slf4fx.TestClient", WARN, "slf4fx log warn message"));
-        messages.add(newLogRecordMessage("org.room13.slf4fx.TestClient", INFO, "slf4fx log info message"));
-        messages.add(newLogRecordMessage("org.room13.slf4fx.TestClient", DEBUG, "slf4fx log debug message"));
-        messages.add(newLogRecordMessage("org.room13.slf4fx.TestClient", TRACE, "slf4fx log trace message"));
-
         final Set<LogRecordMessage> expectations = new HashSet<LogRecordMessage>();
-        expectations.add(newLogRecordMessage("slf4fx.myApplication.org.room13.slf4fx.TestClient", ERROR, "slf4fx log error message"));
-        expectations.add(newLogRecordMessage("slf4fx.myApplication.org.room13.slf4fx.TestClient", WARN, "slf4fx log warn message"));
-        expectations.add(newLogRecordMessage("slf4fx.myApplication.org.room13.slf4fx.TestClient", INFO, "slf4fx log info message"));
-        expectations.add(newLogRecordMessage("slf4fx.myApplication.org.room13.slf4fx.TestClient", DEBUG, "slf4fx log debug message"));
-        expectations.add(newLogRecordMessage("slf4fx.myApplication.org.room13.slf4fx.TestClient", TRACE, "slf4fx log trace message"));
-        _appender.setExpectation(expectations);
+        expectations.add(newLogRecordMessage(_testLogger.getName(), ERROR, "slf4fx log error message"));
+        expectations.add(newLogRecordMessage(_testLogger.getName(), WARN, "slf4fx log warn message"));
+        expectations.add(newLogRecordMessage(_testLogger.getName(), INFO, "slf4fx log info message"));
+        expectations.add(newLogRecordMessage(_testLogger.getName(), DEBUG, "slf4fx log debug message"));
+        expectations.add(newLogRecordMessage(_testLogger.getName(), TRACE, "slf4fx log trace message"));
+        _testLogger.setExpectations(expectations);
 
-        final TestClient client = new TestClient("myApplication", "mySecret", messages);
-        newConnector(client.getIoHandler()).connect(new InetSocketAddress(_PORT));
+        final Set<LogRecordMessage> eventsToSend = new HashSet<LogRecordMessage>();
+        eventsToSend.add(newLogRecordMessage(TestClient.class.getName(), ERROR, "slf4fx log error message"));
+        eventsToSend.add(newLogRecordMessage(TestClient.class.getName(), WARN, "slf4fx log warn message"));
+        eventsToSend.add(newLogRecordMessage(TestClient.class.getName(), INFO, "slf4fx log info message"));
+        eventsToSend.add(newLogRecordMessage(TestClient.class.getName(), DEBUG, "slf4fx log debug message"));
+        eventsToSend.add(newLogRecordMessage(TestClient.class.getName(), TRACE, "slf4fx log trace message"));
+
+        newConnector(new TestClient("myApplication", "mySecret", eventsToSend).getIoHandler())
+                .connect(_server.getDefaultLocalAddress());
         try {
             // give a client chance to send data
             Thread.sleep(400);
         } catch (InterruptedException e) {
             // ignore
         }
-        assertEquals(_appender.getExpectation().size(), 0);
+
+        assertEquals(_testLogger.getExpectations().size(), 0);
     }
 }
