@@ -18,13 +18,13 @@
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>org.room13.slf4fx</groupId>
-        <artifactId>slf4fx-client</artifactId>
+        <artifactId>slf4fx-examples</artifactId>
         <version>1.11-SNAPSHOT</version>
     </parent>
 
     <packaging>swf</packaging>
-    <artifactId>slf4fx-sample</artifactId>
-    <name>slf4fx :: flex :: sample application</name>
+    <artifactId>slf4fx-simple-client</artifactId>
+    <name>slf4fx :: examples :: simple client</name>
 
     <build>
         <plugins>
