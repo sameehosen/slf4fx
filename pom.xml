@@ -80,8 +80,9 @@
     </distributionManagement>
 
     <modules>
-        <module>slf4fx-server</module>
-        <module>slf4fx-client</module>
+        <module>lib-server</module>
+        <module>lib-client</module>
+        <module>examples</module>
     </modules>
 
     <build>
