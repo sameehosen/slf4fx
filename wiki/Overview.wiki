@@ -58,7 +58,7 @@ Binary package includes simple slf4fx server, that could be used for development
     }
 }}}
 
-==Logging category==
+=Logging category=
 All log events from applications will have category in form:
 {{{
 slf4fx.APPLICATION_ID.LOG_RECORD_CATEGORY
