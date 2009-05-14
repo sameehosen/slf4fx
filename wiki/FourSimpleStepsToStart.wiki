@@ -40,7 +40,7 @@ In our case we start sample application in browser.
 
 [http://slf4fx.googlecode.com/svn/wiki/images/sample-app.png]
 
-==STEP4: You watch the log==
+==STEP4: Watch the log==
 {{{
 01:06:27.883 DEBUG MyApplication : level=2 **DEBUG**
 01:06:27.890 INFO  MyApplication : level=4 **INFO**
