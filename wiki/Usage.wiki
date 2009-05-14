@@ -1,4 +1,5 @@
 #summary Some note on usage simple slf4fx server
+#labels Featured
 
 =Start server=
 To start server with default configuration open the terminal (run cmd.exe on Windows), change current directory to directory where slf4fx binary package installed and execute following command: 
