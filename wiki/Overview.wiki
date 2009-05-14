@@ -2,7 +2,7 @@
 #labels Phase-Deploy,Featured
 
 =Client=
-Next code is the sample application that generates some log events when you click on button.
+It's pretty easy to integrate slf4fx in your application. Just add slf3fx_client.swc as library to you application and add target `Slf4FxLoggingTarget` to your log. Look at sample application.
 {{{
 <?xml version="1.0" encoding="utf-8"?>
 <mx:Application xmlns:mx="http://www.adobe.com/2006/mxml" layout="absolute" applicationComplete="init()">
@@ -30,53 +30,37 @@ Next code is the sample application that generates some log events when you clic
 </mx:Application>
 }}}
 
-=Log=
-Following is log of sample application:
-{{{
-01:06:27.883 DEBUG MyApplication : level=2 **DEBUG**
-01:06:27.890 INFO  MyApplication : level=4 **INFO**
-01:06:27.890 WARN  MyApplication : level=6 **WARN**
-01:06:27.891 ERROR MyApplication : level=8 **ERROR**
-01:06:27.891 ERROR MyApplication : level=1000 **FATAL**
-}}}
-
 =Server=
-
-==Start server==
-To start server with default configuration execute command `java -jar slf4fx-server.jar`  from command line (run cmd.exe on Windows, open Terminal application on MacOSX, open your favorite terminal elsewhere)
+Binary package includes simple slf4fx server, that could be used for development. However you can integrate slf4fx server bean in your own application. Following code snippet from simple slf4fx server demonstrates how to integrate bean in application
 {{{
-00:46:32.410 INFO  SLF4FxServer : slf4fx (version 1.2-SNAPSHOT)
-00:46:32.411 INFO  SLF4FxServer : session timeout is 60 seconds
-00:46:32.411 INFO  SLF4FxServer : reader buffer size is 1024
-00:46:32.411 INFO  SLF4FxServer : known applications []
-00:46:32.411 INFO  SLF4FxServer : support for <policy-file-request/> is disabled
-00:46:32.412 INFO  SLF4FxServer : listen localhost/127.0.0.1:18888
-00:46:32.423 INFO  SLF4FxServer : server started in 529ms
-}}}
-Server will output all log events to console and all records with `slf4fx.*` category to `flex.log` file.
+    public static void main(String[] args) {
+        
+        // ...  
+        
+        try {
+            final SLF4FxServer server = new SLF4FxServer();
 
-==Stop server==
-To stop server just press `Control-C` in server window (terminal window with running server).
+            // ... doing additional configuration of server
 
-==Configure server==
-Configuration is easy - just provide additional options in server command line. The command `java -jar slf4fx-server.jar --help`prints list of available options
-{{{
-usage: java -jar slf4fx-server.jar [OPTIONS]
-Version 1.2-SNAPSHOT
- -b,--bind <ADDRESS[:PORT]>        bind SLF4Fx server to this address
- -h,--help                         print this message
- -k,--known-applications <FILE>    known applications descriptor file(one pair
-                                   APPLICATION=SECRET per line)
- -p,--policy-file <FILE>           socket policy file for Adobe Flash Player
- -r,--reader-buffer-size <BYTES>   protocol decoder buffer size
- -t,--session-timeout <TIMEOUT>    session timeout in seconds
+            // add shutdown hook so server will be stoped on jvm shutdown event
+
+            Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {
+                public void run() {
+                    server.stop();
+                }
+            }));
+
+            server.start();
+        } catch (Exception e) {
+            System.err.println("failed to start slf4fx server");
+            e.printStackTrace(System.err);
+        }
+    }
 }}}
 
-==Configure logging==
-Standalone SLF4FFx server (from binaries) uses log4j for logging all events. All log events from applications will have
-category named as:
+===Understanding logging category===
+All log events from applications will have category in form:
 {{{
 slf4fx.APPLICATION_ID.LOG_RECORD_CATEGORY
 }}}
-`APPLICATION_ID` is application name given as parameter to `Slf4FxLoggingTarget` on client side and `LOG_RECORD_CATEGORY` is logger category on client side.
-Log4J can be configured from command line too by adding `-D...` parameter before `-jar slf4fx-server.jar` in command line. See Log4J documentation for details.
+Where *slf4fx* is constant suffix. *APPLICATION_ID* is application name given as parameter to _Slf4FxLoggingTarget_ on client side. Application id is optional parameter. *LOG_RECORD_CATEGORY* is logger category on client side.
