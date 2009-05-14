@@ -1,6 +1,6 @@
 #summary How to start with slf4fx
+#labels Featured
 
-=Four simple steps to start=
 ==STEP1:  Add slf4fx to you Flex3 application==
 {{{
 <?xml version="1.0" encoding="utf-8"?>
