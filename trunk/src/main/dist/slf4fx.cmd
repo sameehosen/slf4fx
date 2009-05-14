@@ -1,2 +1,3 @@
 @echo off
-java -jar slf4fx-server-deps.jar
+title "Simple SLF4Fx server"
+java -Xmx1m -jar slf4fx-server-deps.jar %*

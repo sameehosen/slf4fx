@@ -16,7 +16,12 @@ while [ -h "$PRG" ] ; do
   fi
 done
 
+# stop current slf4fx instance if any
+PID=`jps | grep slf4fx-server-deps.jar | awk '{printf "%s",$1}'`
+[ -n "${PID}" ] && kill ${PID}
+
+# start new slf4fx instance
 SLF4FX_HOME=`dirname "$PRG"`
 cd "${SLF4FX_HOME}"
-java -jar "${SLF4FX_HOME}/slf4fx-server-deps.jar"
+java -d64 -Xmx1m -jar "${SLF4FX_HOME}/slf4fx-server-deps.jar" $* &
 cd "${CURRENT_DIR}"
