@@ -1,5 +1,5 @@
 #summary Project overview
-#labels Phase-Deploy,Featured
+#labels Featured
 
 =Client=
 It's pretty easy to integrate slf4fx in your application. Just add slf3fx_client.swc as library to you application and add target `Slf4FxLoggingTarget` to your log. Look at sample application.
@@ -58,7 +58,7 @@ Binary package includes simple slf4fx server, that could be used for development
     }
 }}}
 
-===Understanding logging category===
+==Logging category==
 All log events from applications will have category in form:
 {{{
 slf4fx.APPLICATION_ID.LOG_RECORD_CATEGORY
