@@ -6,7 +6,7 @@ To start server with default configuration open the terminal (run cmd.exe on Win
 {{{
 java -jar slf4fx-server-deps.jar
 }}}
-Also you can use provided scripts `slf4fx.cmd` (windows) and `slf4fx.sh` (\*nix) instead of that command.
+Instead of that command you can use scripts `slf4fx.cmd` (on windows) and `slf4fx.sh` (on `*`nix). Those scripts included in binary archive.
 
 You will see next text
 {{{
