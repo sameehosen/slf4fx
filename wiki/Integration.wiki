@@ -1,4 +1,5 @@
 #summary How to integrate on client and server side
+#labels Featured,Phase-Implementation
 
 =Client=
 It's pretty easy to integrate slf4fx in your application. Just add slf3fx_client.swc as library to you application and add target `Slf4FxLoggingTarget` to your log. Look at sample application.
