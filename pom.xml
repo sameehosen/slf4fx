@@ -18,7 +18,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.room13.slf4fx</groupId>
     <artifactId>slf4fx-suite</artifactId>
-    <version>1.12</version>
+    <version>1.13-SNAPSHOT</version>
     <packaging>pom</packaging>
     <name>slf4fx</name>
 
@@ -65,7 +65,7 @@
 
     <scm>
         <developerConnection>
-            scm:svn:https://slf4fx.googlecode.com/svn/tags/slf4fx-suite-1.12
+            scm:svn:https://slf4fx.googlecode.com/svn/trunk
         </developerConnection>
     </scm>
 
