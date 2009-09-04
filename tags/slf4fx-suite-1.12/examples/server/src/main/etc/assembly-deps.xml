@@ -1,0 +1,20 @@
+<assembly>
+    <id>deps</id>
+    <formats>
+        <format>jar</format>
+    </formats>
+    <includeBaseDirectory>false</includeBaseDirectory>
+    <dependencySets>
+        <dependencySet>
+            <outputDirectory/>
+            <outputFileNameMapping/>
+            <unpack>true</unpack>
+        </dependencySet>
+        <dependencySet>
+            <outputDirectory/>
+            <outputFileNameMapping/>
+            <unpack>true</unpack>
+            <scope>provided</scope>
+        </dependencySet>
+    </dependencySets>
+</assembly>
