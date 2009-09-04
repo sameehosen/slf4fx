@@ -19,7 +19,7 @@
     <parent>
         <groupId>org.room13.slf4fx</groupId>
         <artifactId>slf4fx-examples</artifactId>
-        <version>1.12-SNAPSHOT</version>
+        <version>1.12</version>
     </parent>
 
     <packaging>swf</packaging>
@@ -61,10 +61,7 @@
                 <artifactId>flexmojos-maven-plugin</artifactId>
                 <extensions>true</extensions>
                 <configuration>
-<!--
-                    <configurationReport>false</configurationReport>
--->
-                    <quick>true</quick>
+                    <configurationReport>true</configurationReport>
                     <debug>true</debug>
                     <headlessServer>true</headlessServer>
                     <includeSources>
@@ -73,6 +70,14 @@
                     <targetPlayer>9.0.115</targetPlayer>
                     <sourceFile>SampleApp.mxml</sourceFile>
                 </configuration>
+                <dependencies>
+                    <dependency>
+                        <groupId>com.adobe.flex</groupId>
+                        <artifactId>compiler</artifactId>
+                        <version>3.3.0.4852</version>
+                        <type>pom</type>
+                    </dependency>
+                </dependencies>
             </plugin>
         </plugins>
     </build>
